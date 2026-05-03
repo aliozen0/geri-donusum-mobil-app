@@ -1,12 +1,6 @@
-// =====================================================
-// EcoScan - Geri Dönüşüm Gamification App
-// Tüm veri localStorage'da saklanır, backend yok
-// =====================================================
-
 (function () {
   'use strict';
 
-  // ===================== CONSTANTS =====================
   var AVATARS = ['🌱', '🌻', '🐝', '🦋', '🌍', '🐢'];
 
   var MATERIALS = [
@@ -19,19 +13,22 @@
   ];
 
   var LEVELS = [
-    { min: 0,   max: 99,   name: '🌱 Çevre Dostu' },
-    { min: 100, max: 299,  name: '♻️ Geri Dönüşüm Kahramanı' },
-    { min: 300, max: 599,  name: '🌍 Dünya Koruyucusu' },
+    { min: 0,   max: 99,    name: '🌱 Çevre Dostu' },
+    { min: 100, max: 299,   name: '♻️ Geri Dönüşüm Kahramanı' },
+    { min: 300, max: 599,   name: '🌍 Dünya Koruyucusu' },
     { min: 600, max: 99999, name: '🏆 Ekoloji Efsanesi' }
   ];
 
   var BADGES = [
     { id: 'ilk_adim',       name: 'İlk Adım',        icon: '👣', check: function(d) { return d.totalScans >= 1; } },
-    { id: 'cam_ustasi',     name: 'Cam Ustası',       icon: '🫙', check: function(d) { return (d.categoryCounts.cam || 0) >= 10; } },
-    { id: 'kagit_samp',     name: 'Kağıt Şampiyonu',  icon: '📄', check: function(d) { return (d.categoryCounts.kagit || 0) >= 10; } },
+    { id: 'cam_ustasi',     name: 'Cam Ustası',       icon: '🫙', check: function(d) { return (d.categoryCounts.cam||0) >= 10; } },
+    { id: 'kagit_samp',     name: 'Kağıt Şampiyonu',  icon: '📄', check: function(d) { return (d.categoryCounts.kagit||0) >= 10; } },
     { id: 'hafta_kahraman', name: 'Hafta Kahramanı',   icon: '🗓️', check: function(d) { return d.weekPoints >= 50; } },
     { id: 'ekoloji',        name: 'Ekoloji Dostu',    icon: '🌿', check: function(d) { return d.totalPoints >= 100; } },
-    { id: 'super_eco',      name: 'Süper Ekolog',     icon: '🦸', check: function(d) { return d.totalPoints >= 300; } }
+    { id: 'super_eco',      name: 'Süper Ekolog',     icon: '🦸', check: function(d) { return d.totalPoints >= 300; } },
+    { id: 'seri_ust',       name: 'Seri Ustası',      icon: '🔥', check: function(d) { return d.maxStreak >= 5; } },
+    { id: 'plastik_sav',    name: 'Plastik Savaşçı',  icon: '🧴', check: function(d) { return (d.categoryCounts.plastik||0) >= 10; } },
+    { id: 'geri_don_kral',  name: 'Geri Dönüşüm Kralı', icon: '👑', check: function(d) { return d.totalScans >= 50; } }
   ];
 
   var MOCK_USERS = [
@@ -46,615 +43,365 @@
     { name: 'Deniz Y.',  avatar: '🦋', ptsAll: 220,  ptsWeek: 55 }
   ];
 
-  // ===================== STATE =====================
+  // Bin code → bin info database
+  var BIN_DB = {
+    'ECO001': { n: 'Okul Bahcesi Kutusu', l: 'A Blok Girisi' },
+    'ECO002': { n: 'Kantin Geri Donusum', l: 'B Blok Kantin' },
+    'ECO003': { n: 'Kutuphane Kutusu',    l: 'Merkez Kutuphane' },
+    'ECO004': { n: 'Spor Salonu Kutusu',  l: 'Spor Kompleksi' },
+    'ECO005': { n: 'Park Geri Donusum',   l: 'Yesil Park Girisi' }
+  };
+
+  var FUN_FACTS = [
+    '🌳 1 ton kağıt geri dönüştürmek 17 ağaç kurtarır!',
+    '🧴 Bir plastik şişe doğada 450 yıl kalır!',
+    '🫙 Cam %100 geri dönüştürülebilir ve sonsuz kez kullanılabilir!',
+    '🥫 Alüminyum kutu geri dönüşümü %95 enerji tasarrufu sağlar!',
+    '💧 1 kg kağıt geri dönüşümü 26 litre su tasarrufu sağlar!',
+    '🔋 1 pil 1 milyon litre suyu kirletebilir!',
+    '🌍 Geri dönüşüm sayesinde sera gazı emisyonu %30 azalır!',
+    '♻️ Türkiye\'de yılda 31 milyon ton atık üretiliyor!',
+    '🍂 Organik atıklar kompost yapılarak toprağa kazandırılır!',
+    '🌱 Her geri dönüşüm eylemi dünyayı biraz daha yeşil yapar!'
+  ];
+
+  // ===== STATE =====
   var state = loadState();
   var currentBin = null;
   var qrScanner = null;
   var selectedAvatar = state.avatar || '';
 
-  function getDefaultState() {
-    return {
-      name: '',
-      avatar: '',
-      totalPoints: 0,
-      totalScans: 0,
-      categoryCounts: {},
-      activities: [],
-      onboarded: false,
-      firstScanDone: false
-    };
+  function getDefault() {
+    return { name:'', avatar:'', totalPoints:0, totalScans:0, categoryCounts:{},
+             activities:[], onboarded:false, firstScanDone:false, streak:0, maxStreak:0, lastScanDate:'' };
   }
 
   function loadState() {
     try {
-      var raw = localStorage.getItem('ecoscan_state');
-      if (raw) {
-        var parsed = JSON.parse(raw);
-        var defaults = getDefaultState();
-        // Merge with defaults so new fields are always present
-        for (var key in defaults) {
-          if (!(key in parsed)) {
-            parsed[key] = defaults[key];
-          }
-        }
-        return parsed;
-      }
-    } catch (e) {
-      console.error('State load error:', e);
-    }
-    return getDefaultState();
+      var s = JSON.parse(localStorage.getItem('ecoscan_state'));
+      if (s) { var d = getDefault(); for (var k in d) { if (!(k in s)) s[k]=d[k]; } return s; }
+    } catch(e) {}
+    return getDefault();
   }
 
-  function saveState() {
-    try {
-      localStorage.setItem('ecoscan_state', JSON.stringify(state));
-    } catch (e) {
-      console.error('State save error:', e);
-    }
-  }
+  function saveState() { try { localStorage.setItem('ecoscan_state', JSON.stringify(state)); } catch(e) {} }
 
-  // ===================== HELPERS =====================
-  function todayStr() {
-    return new Date().toISOString().slice(0, 10);
-  }
+  // ===== HELPERS =====
+  function $(id) { return document.getElementById(id); }
+  function todayStr() { return new Date().toISOString().slice(0,10); }
 
   function getTodayScans() {
-    var today = todayStr();
-    var count = 0;
-    for (var i = 0; i < state.activities.length; i++) {
-      if (state.activities[i].date === today) count++;
-    }
-    return count;
+    var t=todayStr(), c=0;
+    for (var i=0;i<state.activities.length;i++) if(state.activities[i].date===t) c++;
+    return c;
+  }
+
+  function getWeekScans() {
+    var wa = new Date(Date.now()-7*864e5).toISOString().slice(0,10), c=0;
+    for (var i=0;i<state.activities.length;i++) if(state.activities[i].date>=wa) c++;
+    return c;
   }
 
   function getWeekPoints() {
-    var now = new Date();
-    var weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    var pts = 0;
-    for (var i = 0; i < state.activities.length; i++) {
-      if (state.activities[i].date >= weekAgo) {
-        pts += state.activities[i].pts;
-      }
-    }
-    return pts;
+    var wa = new Date(Date.now()-7*864e5).toISOString().slice(0,10), p=0;
+    for (var i=0;i<state.activities.length;i++) if(state.activities[i].date>=wa) p+=state.activities[i].pts;
+    return p;
   }
 
-  function getLevel(pts) {
-    for (var i = LEVELS.length - 1; i >= 0; i--) {
-      if (pts >= LEVELS[i].min) return LEVELS[i];
-    }
-    return LEVELS[0];
+  function getLevel(p) { for(var i=LEVELS.length-1;i>=0;i--) if(p>=LEVELS[i].min) return LEVELS[i]; return LEVELS[0]; }
+
+  function getLevelProgress(p) {
+    var l=getLevel(p); return Math.min(((p-l.min)/(l.max-l.min+1))*100,100);
   }
 
-  function getLevelProgress(pts) {
-    var lv = getLevel(pts);
-    var range = lv.max - lv.min + 1;
-    var progress = ((pts - lv.min) / range) * 100;
-    return Math.min(progress, 100);
-  }
-
-  function getNextLevel(pts) {
-    var lv = getLevel(pts);
-    for (var i = 0; i < LEVELS.length; i++) {
-      if (LEVELS[i] === lv && i < LEVELS.length - 1) {
-        return LEVELS[i + 1];
-      }
-    }
+  function getNextLevel(p) {
+    var l=getLevel(p);
+    for(var i=0;i<LEVELS.length;i++) if(LEVELS[i]===l && i<LEVELS.length-1) return LEVELS[i+1];
     return null;
   }
 
-  function getFavoriteCategory() {
-    var cc = state.categoryCounts;
-    var maxVal = 0;
-    var favId = '';
-    for (var k in cc) {
-      if (cc[k] > maxVal) {
-        maxVal = cc[k];
-        favId = k;
-      }
-    }
-    if (!favId) return '-';
-    for (var i = 0; i < MATERIALS.length; i++) {
-      if (MATERIALS[i].id === favId) return MATERIALS[i].name;
-    }
+  function getFavCat() {
+    var cc=state.categoryCounts, m=0, f='';
+    for(var k in cc) if(cc[k]>m){m=cc[k];f=k;}
+    if(!f) return '-';
+    for(var i=0;i<MATERIALS.length;i++) if(MATERIALS[i].id===f) return MATERIALS[i].name;
     return '-';
   }
 
-  function timeAgo(dateStr) {
-    var d = new Date(dateStr);
-    var now = new Date();
-    var diffMin = Math.floor((now - d) / 60000);
-    if (diffMin < 1) return 'Az önce';
-    if (diffMin < 60) return diffMin + ' dk önce';
-    var diffH = Math.floor(diffMin / 60);
-    if (diffH < 24) return diffH + ' saat önce';
-    var diffD = Math.floor(diffH / 24);
-    return diffD + ' gün önce';
+  function timeAgo(d) {
+    var dm=Math.floor((new Date()-new Date(d))/60000);
+    if(dm<1) return 'Az önce'; if(dm<60) return dm+' dk önce';
+    var dh=Math.floor(dm/60); if(dh<24) return dh+' saat önce';
+    return Math.floor(dh/24)+' gün önce';
   }
 
-  function getMaterialById(id) {
-    for (var i = 0; i < MATERIALS.length; i++) {
-      if (MATERIALS[i].id === id) return MATERIALS[i];
+  function getMat(id) { for(var i=0;i<MATERIALS.length;i++) if(MATERIALS[i].id===id) return MATERIALS[i]; return MATERIALS[0]; }
+
+  function updateStreak() {
+    var today = todayStr();
+    if (state.lastScanDate === today) return; // already scanned today
+    var yesterday = new Date(Date.now()-864e5).toISOString().slice(0,10);
+    if (state.lastScanDate === yesterday) {
+      state.streak++;
+    } else {
+      state.streak = 1;
     }
-    return MATERIALS[0];
+    if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+    state.lastScanDate = today;
   }
 
-  // ===================== DOM HELPERS =====================
-  function $(id) { return document.getElementById(id); }
-
-  // ===================== NAVIGATION =====================
+  // ===== NAVIGATION =====
   function showScreen(id) {
     var screens = document.querySelectorAll('.screen');
-    for (var i = 0; i < screens.length; i++) {
-      screens[i].classList.remove('active');
-    }
-    var target = $('screen-' + id);
-    if (target) target.classList.add('active');
-
-    // Update nav highlights
-    var navItems = document.querySelectorAll('.nav-item');
-    for (var i = 0; i < navItems.length; i++) {
-      if (navItems[i].getAttribute('data-screen') === id) {
-        navItems[i].classList.add('active');
-      } else {
-        navItems[i].classList.remove('active');
-      }
-    }
-
-    // Stop scanner when leaving scanner screen
-    if (id !== 'scanner' && qrScanner) {
-      try { qrScanner.stop(); } catch (e) {}
-      qrScanner = null;
-    }
-
-    // Render screen content
-    switch (id) {
-      case 'home': renderHome(); break;
-      case 'leaderboard': renderLeaderboard('week'); break;
-      case 'profile': renderProfile(); break;
-      case 'scanner': startScanner(); break;
-    }
+    for(var i=0;i<screens.length;i++) screens[i].classList.remove('active');
+    var t=$('screen-'+id); if(t) t.classList.add('active');
+    var navs = document.querySelectorAll('.nav-item');
+    for(var i=0;i<navs.length;i++) navs[i].classList.toggle('active', navs[i].getAttribute('data-screen')===id);
+    if(id!=='scanner' && qrScanner) { try{qrScanner.stop();}catch(e){} qrScanner=null; }
+    if(id==='home') renderHome();
+    if(id==='leaderboard') renderLeaderboard('week');
+    if(id==='profile') renderProfile();
+    if(id==='scanner') startScanner();
   }
 
-  // ===================== ONBOARDING =====================
+  // ===== ONBOARDING =====
   function initOnboarding() {
-    var grid = $('avatar-grid');
-    grid.innerHTML = '';
-
-    for (var i = 0; i < AVATARS.length; i++) {
-      (function (avatar) {
-        var btn = document.createElement('button');
-        btn.className = 'avatar-option';
-        btn.textContent = avatar;
-        btn.setAttribute('type', 'button');
-        btn.addEventListener('click', function () {
-          var allAvatars = document.querySelectorAll('.avatar-option');
-          for (var j = 0; j < allAvatars.length; j++) {
-            allAvatars[j].classList.remove('selected');
-          }
-          btn.classList.add('selected');
-          selectedAvatar = avatar;
-          checkJoinBtn();
+    var grid=$('avatar-grid'); grid.innerHTML='';
+    for(var i=0;i<AVATARS.length;i++) {
+      (function(av){
+        var b=document.createElement('button');
+        b.className='avatar-option'; b.textContent=av; b.type='button';
+        b.addEventListener('click',function(){
+          var all=document.querySelectorAll('.avatar-option');
+          for(var j=0;j<all.length;j++) all[j].classList.remove('selected');
+          b.classList.add('selected'); selectedAvatar=av; checkJoin();
         });
-        grid.appendChild(btn);
+        grid.appendChild(b);
       })(AVATARS[i]);
     }
-
-    $('input-name').addEventListener('input', checkJoinBtn);
-
-    $('btn-join').addEventListener('click', function () {
-      var name = $('input-name').value.trim();
-      if (name.length < 2 || !selectedAvatar) return;
-
-      state.name = name;
-      state.avatar = selectedAvatar;
-      state.onboarded = true;
-      saveState();
-
-      $('bottom-nav').style.display = 'flex';
-      showScreen('home');
-
-      // Show tutorial tooltip on first launch
-      if (!state.firstScanDone) {
-        var tip = $('tutorial-tooltip');
-        tip.classList.add('show');
-        setTimeout(function () { tip.classList.remove('show'); }, 5000);
-      }
+    $('input-name').addEventListener('input', checkJoin);
+    $('btn-join').addEventListener('click', function(){
+      var n=$('input-name').value.trim();
+      if(n.length<2||!selectedAvatar) return;
+      state.name=n; state.avatar=selectedAvatar; state.onboarded=true; saveState();
+      $('bottom-nav').style.display='flex'; showScreen('home');
+      if(!state.firstScanDone){ var tip=$('tutorial-tooltip'); tip.classList.add('show'); setTimeout(function(){tip.classList.remove('show');},5000); }
     });
   }
 
-  function checkJoinBtn() {
-    var name = $('input-name').value.trim();
-    $('btn-join').disabled = !(name.length >= 2 && selectedAvatar);
-  }
+  function checkJoin() { $('btn-join').disabled=!($('input-name').value.trim().length>=2 && selectedAvatar); }
 
-  // ===================== HOME =====================
+  // ===== HOME =====
   function renderHome() {
-    $('home-avatar').textContent = state.avatar;
-    $('home-greeting-text').textContent = 'Merhaba, ' + state.name + '! 🌱';
-    $('stat-total-pts').textContent = state.totalPoints;
-    $('stat-today-scans').textContent = getTodayScans();
+    $('home-avatar').textContent=state.avatar;
+    $('home-greeting-text').textContent='Merhaba, '+state.name+'! 🌱';
+    $('stat-total-pts').textContent=state.totalPoints;
+    $('stat-today-scans').textContent=getTodayScans();
 
-    var lv = getLevel(state.totalPoints);
-    var next = getNextLevel(state.totalPoints);
-    $('level-name').textContent = lv.name;
-    $('level-sub').textContent = next
-      ? 'Sonraki seviye: ' + next.name + ' (' + next.min + ' puan)'
-      : 'Maksimum seviyeye ulaştın!';
-    $('level-bar-fill').style.width = getLevelProgress(state.totalPoints) + '%';
+    var lv=getLevel(state.totalPoints), nx=getNextLevel(state.totalPoints);
+    $('level-name').textContent=lv.name;
+    $('level-sub').textContent=nx?'Sonraki: '+nx.name+' ('+nx.min+' puan)':'Maksimum seviye!';
+    $('level-bar-fill').style.width=getLevelProgress(state.totalPoints)+'%';
+
+    // Streak
+    var sc=$('streak-card');
+    if(state.streak>=2){ sc.style.display='flex'; $('streak-count').textContent=state.streak+' gün seri! 🔥'; }
+    else { sc.style.display='none'; }
+
+    // Eco impact (approximate)
+    var ts=state.totalScans;
+    $('eco-trees').textContent=(ts*0.02).toFixed(1);
+    $('eco-co2').textContent=(ts*0.5).toFixed(1)+' kg';
+    $('eco-water').textContent=(ts*2.6).toFixed(0)+' L';
+
+    // Weekly challenge
+    var ws=getWeekScans(), goal=5;
+    if(ws>=5) goal=10; if(ws>=10) goal=20;
+    var pct=Math.min((ws/goal)*100,100);
+    $('ch-title').textContent='Haftalık Görev: '+goal+' tarama yap!';
+    $('ch-progress').textContent=Math.min(ws,goal)+'/'+goal+' tamamlandı'+(ws>=goal?' ✅':'');
+    $('ch-bar-fill').style.width=pct+'%';
 
     // Activity feed
-    var feed = $('activity-feed');
-    var recent = state.activities.slice(-5).reverse();
-
-    if (recent.length === 0) {
-      feed.innerHTML = '<p class="empty-msg">Henüz bir aktivite yok. QR tarayarak başla!</p>';
-      return;
+    var feed=$('activity-feed'), recent=state.activities.slice(-5).reverse();
+    if(!recent.length){ feed.innerHTML='<p class="empty-msg">Henüz aktivite yok. QR tarayarak başla!</p>'; return; }
+    var h='';
+    for(var i=0;i<recent.length;i++){
+      var a=recent[i], m=getMat(a.category);
+      h+='<div class="activity-item"><div class="activity-icon '+m.cssClass+'">'+m.icon+'</div>'+
+        '<div class="activity-info"><div class="activity-title">'+m.name+' geri dönüştürüldü</div>'+
+        '<div class="activity-sub">'+(a.binName||'Kutu')+' · '+timeAgo(a.timestamp)+'</div></div>'+
+        '<div class="activity-pts">+'+a.pts+'</div></div>';
     }
-
-    var html = '';
-    for (var i = 0; i < recent.length; i++) {
-      var a = recent[i];
-      var mat = getMaterialById(a.category);
-      html += '<div class="activity-item">' +
-        '<div class="activity-icon ' + mat.cssClass + '">' + mat.icon + '</div>' +
-        '<div class="activity-info">' +
-          '<div class="activity-title">' + mat.name + ' geri dönüştürüldü</div>' +
-          '<div class="activity-sub">' + (a.binName || 'Kutu') + ' · ' + timeAgo(a.timestamp) + '</div>' +
-        '</div>' +
-        '<div class="activity-pts">+' + a.pts + '</div>' +
-      '</div>';
-    }
-    feed.innerHTML = html;
+    feed.innerHTML=h;
   }
 
-  // ===================== SCANNER =====================
+  // ===== SCANNER =====
   function startScanner() {
-    var reader = $('qr-reader');
-    reader.innerHTML = '';
-
-    if (typeof Html5Qrcode === 'undefined') {
-      reader.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:200px;color:#fff;padding:20px;text-align:center;font-size:14px;">' +
-        'QR tarayıcı kütüphanesi yüklenemedi.<br>Aşağıdaki manuel test alanını kullanın.' +
-      '</div>';
-      return;
-    }
-
+    var reader=$('qr-reader'); reader.innerHTML='';
+    if(typeof Html5Qrcode==='undefined'){ reader.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:200px;color:#fff;padding:20px;text-align:center;font-size:14px;">QR kütüphanesi yüklenemedi. Kutu kodunu aşağıya girin.</div>'; return; }
     try {
-      qrScanner = new Html5Qrcode('qr-reader');
-      qrScanner.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        function (decodedText) {
-          handleQRResult(decodedText);
-        },
-        function () { /* scan error - ignore */ }
-      ).catch(function (err) {
-        console.warn('Camera error:', err);
-        reader.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:200px;color:#fff;padding:20px;text-align:center;font-size:14px;">' +
-          'Kamera erişimi reddedildi veya kamera bulunamadı.<br><br>' +
-          'Aşağıdaki <strong>manuel test</strong> alanını kullanarak QR verisini yapıştırın.' +
-        '</div>';
-      });
-    } catch (e) {
-      console.error('Scanner init error:', e);
-    }
+      qrScanner=new Html5Qrcode('qr-reader');
+      qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:250}},
+        function(txt){ handleQRResult(txt); }, function(){}).catch(function(){
+          reader.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:200px;color:#fff;padding:20px;text-align:center;font-size:14px;">Kamera bulunamadı.<br>Aşağıdaki kutu kodunu girin.</div>';
+        });
+    } catch(e){}
   }
 
   function handleQRResult(text) {
     try {
-      var data = JSON.parse(text);
-      if (data.binId && data.binName) {
-        // Stop scanner
-        if (qrScanner) {
-          try { qrScanner.stop(); } catch (e) {}
-          qrScanner = null;
-        }
-        currentBin = data;
-        showMaterialSelection(data);
+      var d=JSON.parse(text);
+      // Support both old format (binId/binName) and new format (id/n/l)
+      var binId = d.id || d.binId || '';
+      var binName = d.n || d.binName || '';
+      var binLoc = d.l || d.location || '';
+      if(binId && binName){
+        if(qrScanner){try{qrScanner.stop();}catch(e){} qrScanner=null;}
+        currentBin={id:binId, binName:binName, location:binLoc};
+        showMaterialSelection(currentBin);
       }
-    } catch (e) {
-      // Not a valid EcoScan QR - ignore
-      console.warn('Invalid QR data:', text);
-    }
+    } catch(e){}
   }
 
-  // ===================== MATERIAL SELECTION =====================
+  // Handle bin code input
+  function handleCodeInput(code) {
+    code = code.toUpperCase().trim();
+    if(!code || code.length < 4){ alert('Geçerli bir kutu kodu girin!\nÖrnek: R7K2M9'); return; }
+    var bin = BIN_DB[code];
+    if(bin){
+      currentBin={id:code, binName:bin.n, location:bin.l};
+    } else {
+      // Accept any valid code — use generic name
+      currentBin={id:code, binName:'Geri Donusum Kutusu #'+code, location:'Konum bilinmiyor'};
+    }
+    if(qrScanner){try{qrScanner.stop();}catch(e){} qrScanner=null;}
+    showMaterialSelection(currentBin);
+  }
+
+  // ===== MATERIAL SELECTION =====
   function showMaterialSelection(bin) {
-    $('bin-name').textContent = bin.binName;
-    $('bin-loc').textContent = '📍 ' + (bin.location || 'Bilinmeyen konum');
-
-    var grid = $('material-grid');
-    var html = '';
-    for (var i = 0; i < MATERIALS.length; i++) {
-      var m = MATERIALS[i];
-      html += '<div class="material-card" data-mat-id="' + m.id + '">' +
-        '<div class="mat-icon">' + m.icon + '</div>' +
-        '<div class="mat-name">' + m.name + '</div>' +
-        '<div class="mat-pts">+' + m.pts + ' puan</div>' +
-      '</div>';
+    $('bin-name').textContent=bin.binName;
+    $('bin-loc').textContent='📍 '+(bin.location||'');
+    var grid=$('material-grid'), h='';
+    for(var i=0;i<MATERIALS.length;i++){
+      var m=MATERIALS[i];
+      h+='<div class="material-card" data-mat-id="'+m.id+'"><div class="mat-icon">'+m.icon+'</div><div class="mat-name">'+m.name+'</div><div class="mat-pts">+'+m.pts+' puan</div></div>';
     }
-    grid.innerHTML = html;
-
-    // Add click handlers
-    var cards = grid.querySelectorAll('.material-card');
-    for (var i = 0; i < cards.length; i++) {
-      (function (card) {
-        card.addEventListener('click', function () {
-          var matId = card.getAttribute('data-mat-id');
-          selectMaterial(matId);
-        });
-      })(cards[i]);
+    grid.innerHTML=h;
+    var cards=grid.querySelectorAll('.material-card');
+    for(var i=0;i<cards.length;i++){
+      (function(c){ c.addEventListener('click',function(){ selectMaterial(c.getAttribute('data-mat-id')); }); })(cards[i]);
     }
-
     showScreen('material');
   }
 
   function selectMaterial(matId) {
-    var mat = getMaterialById(matId);
-    if (!mat) return;
+    var mat=getMat(matId); if(!mat) return;
+    var cards=document.querySelectorAll('.material-card');
+    for(var i=0;i<cards.length;i++) cards[i].classList.remove('selected');
+    var sel=document.querySelector('.material-card[data-mat-id="'+matId+'"]');
+    if(sel) sel.classList.add('selected');
 
-    // Highlight selected card
-    var cards = document.querySelectorAll('.material-card');
-    for (var i = 0; i < cards.length; i++) {
-      cards[i].classList.remove('selected');
-    }
-    var selected = document.querySelector('.material-card[data-mat-id="' + matId + '"]');
-    if (selected) selected.classList.add('selected');
+    var bonus=0; if(getTodayScans()+1>=3) bonus=5;
+    var totalPts=mat.pts+bonus;
 
-    // Calculate daily streak bonus
-    var bonus = 0;
-    var todayScansAfter = getTodayScans() + 1;
-    if (todayScansAfter >= 3) bonus = 5;
-
-    var totalPts = mat.pts + bonus;
-
-    // Record activity
-    var activity = {
-      category: matId,
-      pts: totalPts,
-      binName: currentBin ? currentBin.binName : '',
-      binId: currentBin ? currentBin.binId : '',
-      date: todayStr(),
-      timestamp: new Date().toISOString()
-    };
-
-    state.activities.push(activity);
-    state.totalPoints += totalPts;
-    state.totalScans += 1;
-
-    if (!state.categoryCounts[matId]) {
-      state.categoryCounts[matId] = 0;
-    }
-    state.categoryCounts[matId]++;
-
-    if (!state.firstScanDone) {
-      state.firstScanDone = true;
-    }
-
+    state.activities.push({ category:matId, pts:totalPts, binName:currentBin?currentBin.binName:'', binId:currentBin?currentBin.id:'', date:todayStr(), timestamp:new Date().toISOString() });
+    state.totalPoints+=totalPts;
+    state.totalScans++;
+    state.categoryCounts[matId]=(state.categoryCounts[matId]||0)+1;
+    if(!state.firstScanDone) state.firstScanDone=true;
+    updateStreak();
     saveState();
 
-    // Show celebration after short delay
-    setTimeout(function () {
-      showCelebration(totalPts, bonus);
-    }, 350);
+    setTimeout(function(){ showCelebration(totalPts, bonus); }, 350);
   }
 
-  // ===================== CELEBRATION =====================
+  // ===== CELEBRATION =====
   function showCelebration(pts, bonus) {
-    var overlay = $('celebration');
-    var ptsEl = $('cel-pts');
-
-    var msg = '+' + pts + ' puan kazandın!';
-    if (bonus > 0) msg += ' (Günlük Seri +' + bonus + ')';
-    ptsEl.textContent = msg;
-
-    overlay.classList.add('show');
-
-    // Fire confetti
-    if (typeof confetti === 'function') {
-      confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#2D8C4E', '#56B07A', '#A8D5BA', '#FFD700']
-      });
-    }
-
-    setTimeout(function () {
-      overlay.classList.remove('show');
-      currentBin = null;
-      showScreen('home');
-    }, 2200);
+    var msg='+'+pts+' puan kazandın!';
+    if(bonus>0) msg+=' (Günlük Seri +'+bonus+')';
+    $('cel-pts').textContent=msg;
+    $('cel-fact').textContent=FUN_FACTS[Math.floor(Math.random()*FUN_FACTS.length)];
+    $('celebration').classList.add('show');
+    if(typeof confetti==='function') confetti({particleCount:120,spread:80,origin:{y:0.6},colors:['#2D8C4E','#56B07A','#A8D5BA','#FFD700']});
+    setTimeout(function(){ $('celebration').classList.remove('show'); currentBin=null; showScreen('home'); }, 2800);
   }
 
-  // ===================== LEADERBOARD =====================
+  // ===== LEADERBOARD =====
   function renderLeaderboard(tab) {
-    var list = $('lb-list');
-    var isWeek = (tab === 'week');
-
-    // Current user data
-    var userData = {
-      name: state.name + ' (Sen)',
-      avatar: state.avatar,
-      ptsAll: state.totalPoints,
-      ptsWeek: getWeekPoints(),
-      isUser: true
-    };
-
-    // Combine mock + real user
-    var all = MOCK_USERS.slice(); // copy
-    all.push(userData);
-
-    // Sort
-    all.sort(function (a, b) {
-      return isWeek ? (b.ptsWeek - a.ptsWeek) : (b.ptsAll - a.ptsAll);
-    });
-
-    // Render top 10
-    var top10 = all.slice(0, 10);
-    var userInTop = false;
-
-    var html = '';
-    for (var i = 0; i < top10.length; i++) {
-      var u = top10[i];
-      var rank = i + 1;
-      var rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : String(rank);
-      var topClass = rank <= 3 ? ' top' + rank : '';
-      var userClass = u.isUser ? ' current-user' : '';
-      var pts = isWeek ? u.ptsWeek : u.ptsAll;
-
-      if (u.isUser) userInTop = true;
-
-      html += '<div class="lb-item' + topClass + userClass + '">' +
-        '<div class="lb-rank">' + rankBadge + '</div>' +
-        '<div class="lb-avatar">' + u.avatar + '</div>' +
-        '<div class="lb-name">' + u.name + '</div>' +
-        '<div class="lb-pts">' + pts + ' pts</div>' +
-      '</div>';
+    var list=$('lb-list'), isW=(tab==='week');
+    var ud={name:state.name+' (Sen)',avatar:state.avatar,ptsAll:state.totalPoints,ptsWeek:getWeekPoints(),isUser:true};
+    var all=MOCK_USERS.slice(); all.push(ud);
+    all.sort(function(a,b){ return isW?(b.ptsWeek-a.ptsWeek):(b.ptsAll-a.ptsAll); });
+    var top=all.slice(0,10), uIn=false, h='';
+    for(var i=0;i<top.length;i++){
+      var u=top[i],r=i+1;
+      var rb=r===1?'🥇':r===2?'🥈':r===3?'🥉':String(r);
+      var tc=r<=3?' top'+r:'', uc=u.isUser?' current-user':'';
+      if(u.isUser) uIn=true;
+      h+='<div class="lb-item'+tc+uc+'"><div class="lb-rank">'+rb+'</div><div class="lb-avatar">'+u.avatar+'</div><div class="lb-name">'+u.name+'</div><div class="lb-pts">'+(isW?u.ptsWeek:u.ptsAll)+' pts</div></div>';
     }
-
-    // If user not in top 10, show them at their actual rank
-    if (!userInTop) {
-      var userRank = 0;
-      for (var i = 0; i < all.length; i++) {
-        if (all[i].isUser) { userRank = i + 1; break; }
-      }
-      var pts = isWeek ? userData.ptsWeek : userData.ptsAll;
-      html += '<div style="text-align:center;color:var(--text-muted);padding:8px;">· · ·</div>';
-      html += '<div class="lb-item current-user">' +
-        '<div class="lb-rank">' + userRank + '</div>' +
-        '<div class="lb-avatar">' + userData.avatar + '</div>' +
-        '<div class="lb-name">' + userData.name + '</div>' +
-        '<div class="lb-pts">' + pts + ' pts</div>' +
-      '</div>';
+    if(!uIn){
+      var ur=0; for(var i=0;i<all.length;i++) if(all[i].isUser){ur=i+1;break;}
+      h+='<div style="text-align:center;color:var(--text-muted);padding:8px;">· · ·</div>';
+      h+='<div class="lb-item current-user"><div class="lb-rank">'+ur+'</div><div class="lb-avatar">'+ud.avatar+'</div><div class="lb-name">'+ud.name+'</div><div class="lb-pts">'+(isW?ud.ptsWeek:ud.ptsAll)+' pts</div></div>';
     }
-
-    list.innerHTML = html;
+    list.innerHTML=h;
   }
 
-  // ===================== PROFILE =====================
+  // ===== PROFILE =====
   function renderProfile() {
-    $('profile-avatar').textContent = state.avatar;
-    $('profile-name').textContent = state.name;
-    $('profile-level').textContent = getLevel(state.totalPoints).name;
-    $('ps-pts').textContent = state.totalPoints;
-    $('ps-scans').textContent = state.totalScans;
-    $('ps-fav').textContent = getFavoriteCategory();
-
-    var badgeData = {
-      totalScans: state.totalScans,
-      totalPoints: state.totalPoints,
-      categoryCounts: state.categoryCounts,
-      weekPoints: getWeekPoints()
-    };
-
-    var grid = $('badges-grid');
-    var html = '';
-    for (var i = 0; i < BADGES.length; i++) {
-      var b = BADGES[i];
-      var earned = b.check(badgeData);
-      html += '<div class="badge-card' + (earned ? '' : ' locked') + '">' +
-        '<div class="badge-icon">' + b.icon + '</div>' +
-        '<div class="badge-name">' + b.name + '</div>' +
-      '</div>';
+    $('profile-avatar').textContent=state.avatar;
+    $('profile-name').textContent=state.name;
+    $('profile-level').textContent=getLevel(state.totalPoints).name;
+    $('ps-pts').textContent=state.totalPoints;
+    $('ps-scans').textContent=state.totalScans;
+    $('ps-fav').textContent=getFavCat();
+    var bd={totalScans:state.totalScans,totalPoints:state.totalPoints,categoryCounts:state.categoryCounts,weekPoints:getWeekPoints(),maxStreak:state.maxStreak||0};
+    var grid=$('badges-grid'), h='';
+    for(var i=0;i<BADGES.length;i++){
+      var b=BADGES[i], earned=b.check(bd);
+      h+='<div class="badge-card'+(earned?'':' locked')+'"><div class="badge-icon">'+b.icon+'</div><div class="badge-name">'+b.name+'</div></div>';
     }
-    grid.innerHTML = html;
+    grid.innerHTML=h;
   }
 
-  // ===================== EDIT NAME =====================
+  // ===== EDIT NAME =====
   function initEditName() {
-    var modal = $('edit-modal');
-
-    $('btn-edit-name').addEventListener('click', function () {
-      $('edit-name-input').value = state.name;
-      modal.classList.add('show');
-    });
-
-    modal.addEventListener('click', function (e) {
-      if (e.target === modal) {
-        modal.classList.remove('show');
-      }
-    });
-
-    $('btn-save-name').addEventListener('click', function () {
-      var newName = $('edit-name-input').value.trim();
-      if (newName.length >= 2) {
-        state.name = newName;
-        saveState();
-        modal.classList.remove('show');
-        renderProfile();
-        renderHome();
-      }
+    var modal=$('edit-modal');
+    $('btn-edit-name').addEventListener('click',function(){ $('edit-name-input').value=state.name; modal.classList.add('show'); });
+    modal.addEventListener('click',function(e){ if(e.target===modal) modal.classList.remove('show'); });
+    $('btn-save-name').addEventListener('click',function(){
+      var n=$('edit-name-input').value.trim();
+      if(n.length>=2){ state.name=n; saveState(); modal.classList.remove('show'); renderProfile(); renderHome(); }
     });
   }
 
-  // ===================== MANUAL QR TEST =====================
-  function initManualTest() {
-    $('btn-manual-scan').addEventListener('click', function () {
-      var input = $('manual-qr-input').value.trim();
-      if (!input) {
-        alert('QR verisini yapıştırın! Örnek:\n{"binId":"bin_001","binName":"Okul Bahçesi Kutusu","location":"A Blok Girişi"}');
-        return;
-      }
-      handleQRResult(input);
-    });
-  }
-
-  // ===================== INIT =====================
+  // ===== INIT =====
   function init() {
     initOnboarding();
     initEditName();
-    initManualTest();
 
-    // Bottom nav
-    var navItems = document.querySelectorAll('.nav-item');
-    for (var i = 0; i < navItems.length; i++) {
-      (function (btn) {
-        btn.addEventListener('click', function () {
-          showScreen(btn.getAttribute('data-screen'));
-        });
-      })(navItems[i]);
-    }
+    var navs=document.querySelectorAll('.nav-item');
+    for(var i=0;i<navs.length;i++)(function(b){b.addEventListener('click',function(){showScreen(b.getAttribute('data-screen'));});})(navs[i]);
 
-    // Home scan button
-    $('btn-scan-home').addEventListener('click', function () {
-      showScreen('scanner');
-    });
+    $('btn-scan-home').addEventListener('click',function(){showScreen('scanner');});
+    $('btn-back-scanner').addEventListener('click',function(){showScreen('home');});
 
-    // Scanner back button
-    $('btn-back-scanner').addEventListener('click', function () {
-      showScreen('home');
-    });
+    // Code input
+    $('btn-code-submit').addEventListener('click',function(){ handleCodeInput($('code-input').value); });
+    $('code-input').addEventListener('keydown',function(e){ if(e.key==='Enter') handleCodeInput(this.value); });
 
-    // Leaderboard tabs
-    var tabBtns = document.querySelectorAll('.tab-btn');
-    for (var i = 0; i < tabBtns.length; i++) {
-      (function (btn) {
-        btn.addEventListener('click', function () {
-          for (var j = 0; j < tabBtns.length; j++) {
-            tabBtns[j].classList.remove('active');
-          }
-          btn.classList.add('active');
-          renderLeaderboard(btn.getAttribute('data-tab'));
-        });
-      })(tabBtns[i]);
-    }
+    var tabs=document.querySelectorAll('.tab-btn');
+    for(var i=0;i<tabs.length;i++)(function(b){b.addEventListener('click',function(){
+      for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
+      b.classList.add('active'); renderLeaderboard(b.getAttribute('data-tab'));
+    });})(tabs[i]);
 
-    // Check if already onboarded
-    if (state.onboarded && state.name) {
-      $('bottom-nav').style.display = 'flex';
-      showScreen('home');
-    } else {
-      $('screen-onboarding').classList.add('active');
-    }
+    if(state.onboarded&&state.name){ $('bottom-nav').style.display='flex'; showScreen('home'); }
+    else { $('screen-onboarding').classList.add('active'); }
   }
 
-  // Start the app
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();

@@ -43,6 +43,15 @@
       <div class="level-bar"><div class="level-bar-fill" id="level-bar-fill"></div></div>
     </div>
 
+    <!-- Streak -->
+    <div class="streak-card" id="streak-card" style="display:none;">
+      <div class="streak-fire">🔥</div>
+      <div class="streak-info">
+        <div class="streak-count" id="streak-count"></div>
+        <div class="streak-label">Günlük Seri Devam Ediyor!</div>
+      </div>
+    </div>
+
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-value" id="stat-total-pts">0</div>
@@ -51,6 +60,35 @@
       <div class="stat-card">
         <div class="stat-value" id="stat-today-scans">0</div>
         <div class="stat-label">Bugün Tarama</div>
+      </div>
+    </div>
+
+    <!-- Eco Impact -->
+    <div class="eco-impact" id="eco-impact">
+      <div class="eco-impact-item">
+        <div class="eco-icon">🌳</div>
+        <div class="eco-val" id="eco-trees">0</div>
+        <div class="eco-label">Ağaç Kurtarıldı</div>
+      </div>
+      <div class="eco-impact-item">
+        <div class="eco-icon">💨</div>
+        <div class="eco-val" id="eco-co2">0 kg</div>
+        <div class="eco-label">CO₂ Azaltıldı</div>
+      </div>
+      <div class="eco-impact-item">
+        <div class="eco-icon">💧</div>
+        <div class="eco-val" id="eco-water">0 L</div>
+        <div class="eco-label">Su Tasarrufu</div>
+      </div>
+    </div>
+
+    <!-- Weekly Challenge -->
+    <div class="challenge-card" id="challenge-card">
+      <div class="ch-icon">🎯</div>
+      <div class="ch-info">
+        <div class="ch-title" id="ch-title">Haftalık Görev: 5 tarama yap!</div>
+        <div class="ch-progress" id="ch-progress">0/5 tamamlandı</div>
+        <div class="challenge-bar"><div class="challenge-bar-fill" id="ch-bar-fill" style="width:0%"></div></div>
       </div>
     </div>
 
@@ -78,11 +116,15 @@
     <div id="qr-reader"></div>
     <p class="scanner-hint">Geri dönüşüm kutusundaki QR kodu kameraya göster</p>
 
-    <!-- Manual test input (for desktop testing without camera) -->
-    <div class="manual-test">
-      <p class="manual-test-title">📋 Kamera yoksa manuel test:</p>
-      <textarea id="manual-qr-input" placeholder='{"binId":"bin_001","binName":"Okul Bahçesi Kutusu","location":"A Blok Girişi"}'></textarea>
-      <button class="btn-secondary" id="btn-manual-scan">Manuel Tara</button>
+    <!-- Code Input -->
+    <div class="code-divider">veya kutu kodunu gir</div>
+    <div class="code-input-area">
+      <div class="code-label">📋 Kutunun üzerindeki kodu yaz</div>
+      <div class="code-example">Örnek: R7K2M9</div>
+      <div class="code-input-row">
+        <input type="text" id="code-input" placeholder="_ _ _ _ _ _" maxlength="6" autocomplete="off">
+        <button id="btn-code-submit">Gönder</button>
+      </div>
     </div>
   </div>
 
@@ -159,6 +201,7 @@
     <div class="cel-icon">🎉</div>
     <div class="cel-text">Harika İş!</div>
     <div class="cel-pts" id="cel-pts"></div>
+    <div class="cel-fact" id="cel-fact"></div>
   </div>
 
   <!-- ===== TUTORIAL TOOLTIP ===== -->
