@@ -150,7 +150,10 @@
       </div>
 
       <div class="settings-card">
-        <h3>👥 Kullanıcılar</h3>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h3 style="margin:0">👥 Kullanıcılar</h3>
+          <button class="btn btn-sm btn-outline" id="btn-refresh" onclick="loadUsers()">🔄 Yenile</button>
+        </div>
         <div class="search-box"><input type="text" id="user-search" placeholder="🔍 İsim ile ara..."></div>
         <div class="user-count" id="user-count"></div>
         <div id="user-list"></div>
@@ -241,7 +244,9 @@
   });
 
   // === USERS ===
+  window.loadUsers=loadUsers;
   function loadUsers(){
+    document.getElementById('user-search').value='';
     document.getElementById('user-list').innerHTML='<p style="color:#7A937A;font-size:13px">Yükleniyor...</p>';
     db.collection('users').orderBy('totalPoints','desc').get().then(function(snap){
       allUsers=[];

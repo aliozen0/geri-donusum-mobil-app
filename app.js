@@ -144,10 +144,19 @@
       firebase.auth().signInAnonymously().then(function(cred){
         currentUid=cred.user.uid;
         console.log('[EcoScan] Auth OK, uid:', currentUid);
-        if(state.onboarded) syncToFirestore();
-        // Check ban status
+        // Check if user was deleted by admin
         db.collection('users').doc(currentUid).get().then(function(doc){
+          if(state.onboarded && !doc.exists){
+            // Admin silmiş — sıfırla
+            console.log('[EcoScan] User deleted by admin, resetting');
+            state=getDefault();
+            saveState();
+            $('bottom-nav').style.display='none';
+            showScreen('onboarding');
+            return;
+          }
           if(doc.exists&&doc.data().banned){window._ecoscanBanned=true;alert('Hesabın yönetici tarafından askıya alındı.');}
+          else if(state.onboarded) syncToFirestore();
         });
         // Load config
         db.collection('config').doc('settings').get().then(function(doc){
