@@ -1,6 +1,19 @@
 (function () {
   'use strict';
 
+  // ===== TOAST NOTIFICATION =====
+  function showToast(msg, type) {
+    type = type || 'warn';
+    var icons = { warn: '⚠️', error: '🚫', info: 'ℹ️', success: '✅' };
+    var c = document.getElementById('toast-container');
+    if (!c) return;
+    var t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML = '<span class="toast-icon">' + (icons[type] || '⚠️') + '</span><span class="toast-msg">' + msg + '</span>';
+    c.appendChild(t);
+    setTimeout(function () { t.classList.add('removing'); setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300); }, 3500);
+  }
+
   // ===== SECURITY HELPERS =====
   function sanitize(str) {
     if (typeof str !== 'string') return '';
@@ -144,23 +157,50 @@
       firebase.auth().signInAnonymously().then(function(cred){
         currentUid=cred.user.uid;
         console.log('[EcoScan] Auth OK, uid:', currentUid);
-        // Check if user was deleted by admin
-        db.collection('users').doc(currentUid).get().then(function(doc){
+        // === REAL-TIME: User doc listener ===
+        db.collection('users').doc(currentUid).onSnapshot(function(doc){
           if(state.onboarded && !doc.exists){
-            // Admin silmiş — sıfırla
             console.log('[EcoScan] User deleted by admin, resetting');
             state=getDefault();
-            saveState();
+            try{localStorage.setItem('ecoscan_state',JSON.stringify(state));}catch(e){}
             $('bottom-nav').style.display='none';
             showScreen('onboarding');
             return;
           }
-          if(doc.exists&&doc.data().banned){window._ecoscanBanned=true;alert('Hesabın yönetici tarafından askıya alındı.');}
-          else if(state.onboarded) syncToFirestore();
+          if(doc.exists){
+            var d=doc.data();
+            var wasBanned=window._ecoscanBanned;
+            if(d.banned){
+              window._ecoscanBanned=true;
+              if(!wasBanned) showToast('Hesabın yönetici tarafından askıya alındı.','error');
+            } else {
+              window._ecoscanBanned=false;
+            }
+            state.name=d.name||state.name;
+            state.avatar=d.avatar||state.avatar;
+            state.totalPoints=typeof d.totalPoints==='number'?d.totalPoints:state.totalPoints;
+            state.totalScans=typeof d.totalScans==='number'?d.totalScans:state.totalScans;
+            state.streak=typeof d.streak==='number'?d.streak:state.streak;
+            state.maxStreak=typeof d.maxStreak==='number'?d.maxStreak:state.maxStreak;
+            try{localStorage.setItem('ecoscan_state',JSON.stringify(state));}catch(e){}
+            console.log('[EcoScan] Real-time sync from Firestore');
+            if(state.onboarded){try{renderHome();renderProfile();}catch(e){}}
+          }
         });
-        // Load config
-        db.collection('config').doc('settings').get().then(function(doc){
-          if(doc.exists){window._ecoscanConfig=doc.data();}
+        // İlk sync
+        if(state.onboarded) syncToFirestore();
+
+        // === REAL-TIME: Config listener ===
+        db.collection('config').doc('settings').onSnapshot(function(doc){
+          if(doc.exists){
+            var prev=window._ecoscanConfig||{};
+            window._ecoscanConfig=doc.data();
+            var c=doc.data();
+            // Scanning toggle notification
+            if(prev.scanningEnabled!==undefined && prev.scanningEnabled!==c.scanningEnabled){
+              showToast(c.scanningEnabled===false?'Tarama yönetici tarafından durduruldu.':'Tarama tekrar aktif!', c.scanningEnabled===false?'warn':'success');
+            }
+          }
         });
       }).catch(function(e){console.error('[EcoScan] Auth error:',e);});
     }catch(e){console.error('[EcoScan] Firebase init error:',e);}
@@ -307,7 +347,7 @@
     $('input-name').addEventListener('input',checkJoin);
     $('btn-join').addEventListener('click',function(){
       // Check registration
-      if(window._ecoscanConfig&&window._ecoscanConfig.registrationOpen===false){alert('Yeni kayıtlar şu anda kapalı!');return;}
+      if(window._ecoscanConfig&&window._ecoscanConfig.registrationOpen===false){showToast('Yeni kayıtlar şu anda kapalı!','error');return;}
       var n=$('input-name').value.trim();if(n.length<2||!selectedAvatar)return;
       state.name=n;state.avatar=selectedAvatar;state.onboarded=true;saveState();
       $('bottom-nav').style.display='flex';showScreen('home');
@@ -352,9 +392,9 @@
     if(id&&n){if(qrScanner){try{qrScanner.stop();}catch(e){}qrScanner=null;}currentBin={id:id,binName:n,location:l};showMaterialSelection(currentBin);}}catch(e){}
   }
   function handleCodeInput(code){
-    if(!canEnterCode()){alert('Çok fazla deneme! 1 dakika bekle.');return;}
+    if(!canEnterCode()){showToast('Çok fazla deneme! 1 dakika bekle.','warn');return;}
     code=code.toUpperCase().trim().replace(/[^A-Z0-9]/g,'');
-    if(!isValidCode(code)){alert('Geçerli bir kutu kodu gir!\nÖrnek: R7K2M9');return;}
+    if(!isValidCode(code)){showToast('Geçerli bir kutu kodu gir! Örnek: R7K2M9','warn');return;}
     var bin=BIN_DB[code];
     currentBin=bin?{id:code,binName:sanitize(bin.n),location:sanitize(bin.l)}:{id:code,binName:'Geri Donusum Kutusu #'+code,location:'Konum bilinmiyor'};
     if(qrScanner){try{qrScanner.stop();}catch(e){}qrScanner=null;}
@@ -374,16 +414,16 @@
   }
 
   function selectMaterial(matId){
-    if(window._ecoscanBanned){alert('Hesabın askıya alındı. Puan kazanamazsın.');return;}
-    if(window._ecoscanConfig&&window._ecoscanConfig.scanningEnabled===false){alert('Tarama şu anda devre dışı.');return;}
-    if(!canScan()){alert('Çok hızlı! Biraz bekle.');return;}
+    if(window._ecoscanBanned){showToast('Hesabın askıya alındı. Puan kazanamazsın.','error');return;}
+    if(window._ecoscanConfig&&window._ecoscanConfig.scanningEnabled===false){showToast('Tarama şu anda devre dışı.','warn');return;}
+    if(!canScan()){showToast('Çok hızlı! Biraz bekle.','warn');return;}
     var mat=getMat(matId);if(!mat)return;
     lastScanTime=Date.now();
     var cards=document.querySelectorAll('.material-card');for(var i=0;i<cards.length;i++)cards[i].classList.remove('selected');
     var sel=document.querySelector('.material-card[data-mat-id="'+matId+'"]');if(sel)sel.classList.add('selected');
     var bonus=0;if(getTodayScans()+1>=3)bonus=5;var totalPts=mat.pts+bonus;
     // Günlük max 100 tarama limiti
-    if(getTodayScans()>=100){alert('Bug\u00fcnk\u00fc limitine ula\u015ft\u0131n! Yar\u0131n devam et.');return;}
+    if(getTodayScans()>=100){showToast('Bugünkü limitine ulaştın! Yarın devam et.','info');return;}
     state.activities.push({category:sanitize(matId),pts:totalPts,binName:currentBin?sanitize(currentBin.binName):'',binId:currentBin?sanitize(currentBin.id):'',date:todayStr(),timestamp:new Date().toISOString()});
     state.totalPoints+=totalPts;state.totalScans++;state.categoryCounts[matId]=(state.categoryCounts[matId]||0)+1;
     if(!state.firstScanDone)state.firstScanDone=true;updateStreak();saveState();
@@ -499,7 +539,10 @@
   // ===== EDIT NAME & AVATAR =====
   function initEditName(){
     var modal=$('edit-modal');
-    $('btn-edit-name').addEventListener('click',function(){$('edit-name-input').value=state.name;modal.classList.add('show');});
+    $('btn-edit-name').addEventListener('click',function(){
+      if(window._ecoscanConfig&&window._ecoscanConfig.allowNameChange===false){showToast('İsim değiştirme yönetici tarafından kapatıldı.','warn');return;}
+      $('edit-name-input').value=state.name;modal.classList.add('show');
+    });
     modal.addEventListener('click',function(e){if(e.target===modal)modal.classList.remove('show');});
     $('btn-save-name').addEventListener('click',function(){
       var n=$('edit-name-input').value.trim();if(n.length>=2){state.name=n;saveState();modal.classList.remove('show');renderProfile();renderHome();}
@@ -508,6 +551,7 @@
   function initAvatarChange(){
     var modal=$('avatar-modal');
     $('btn-change-avatar').addEventListener('click',function(){
+      if(window._ecoscanConfig&&window._ecoscanConfig.allowAvatarChange===false){showToast('Avatar değiştirme yönetici tarafından kapatıldı.','warn');return;}
       selectedAvatar=state.avatar;
       buildAvatarGrid('avatar-change-grid',function(){});
       modal.classList.add('show');

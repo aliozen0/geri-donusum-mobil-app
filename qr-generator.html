@@ -144,6 +144,14 @@
           <label class="toggle-switch"><input type="checkbox" id="tog-scan" checked><span class="toggle-slider"></span></label>
         </div>
         <div class="toggle-row">
+          <span>İsim değiştirme izni</span>
+          <label class="toggle-switch"><input type="checkbox" id="tog-name" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span>Avatar değiştirme izni</span>
+          <label class="toggle-switch"><input type="checkbox" id="tog-avatar" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
           <span>Mock veri (sahte kullanıcılar)</span>
           <label class="toggle-switch"><input type="checkbox" id="tog-mock"><span class="toggle-slider"></span></label>
         </div>
@@ -226,6 +234,8 @@
       var d=doc.exists?doc.data():{};
       document.getElementById('tog-reg').checked=d.registrationOpen!==false;
       document.getElementById('tog-scan').checked=d.scanningEnabled!==false;
+      document.getElementById('tog-name').checked=d.allowNameChange!==false;
+      document.getElementById('tog-avatar').checked=d.allowAvatarChange!==false;
       document.getElementById('tog-mock').checked=localStorage.getItem('ecoscan_mock')==='1';
     });
   }
@@ -237,6 +247,14 @@
   document.getElementById('tog-scan').addEventListener('change',function(){
     db.collection('config').doc('settings').set({scanningEnabled:this.checked},{merge:true});
     showStatus('Tarama '+(this.checked?'aktif':'devre dışı'),'ok');
+  });
+  document.getElementById('tog-name').addEventListener('change',function(){
+    db.collection('config').doc('settings').set({allowNameChange:this.checked},{merge:true});
+    showStatus('İsim değiştirme '+(this.checked?'açık':'kapalı'),'ok');
+  });
+  document.getElementById('tog-avatar').addEventListener('change',function(){
+    db.collection('config').doc('settings').set({allowAvatarChange:this.checked},{merge:true});
+    showStatus('Avatar değiştirme '+(this.checked?'açık':'kapalı'),'ok');
   });
   document.getElementById('tog-mock').addEventListener('change',function(){
     localStorage.setItem('ecoscan_mock',this.checked?'1':'0');
