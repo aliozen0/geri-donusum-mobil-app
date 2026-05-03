@@ -128,11 +128,24 @@ body {
 
 .avatar-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
   margin-bottom: 28px;
   width: 100%;
-  max-width: 280px;
+  max-width: 320px;
+}
+
+.avatar-photo-btn {
+  border: 3px dashed var(--green-200) !important;
+  background: var(--green-50) !important;
+  font-size: 22px !important;
+  flex-direction: column;
+  line-height: 1;
+  color: var(--green-500);
+  overflow: hidden;
+}
+.avatar-photo-btn.selected {
+  border-style: solid !important;
 }
 
 .avatar-option {

@@ -145,6 +145,14 @@
         currentUid=cred.user.uid;
         console.log('[EcoScan] Auth OK, uid:', currentUid);
         if(state.onboarded) syncToFirestore();
+        // Check ban status
+        db.collection('users').doc(currentUid).get().then(function(doc){
+          if(doc.exists&&doc.data().banned){window._ecoscanBanned=true;alert('Hesabın yönetici tarafından askıya alındı.');}
+        });
+        // Load config
+        db.collection('config').doc('settings').get().then(function(doc){
+          if(doc.exists){window._ecoscanConfig=doc.data();}
+        });
       }).catch(function(e){console.error('[EcoScan] Auth error:',e);});
     }catch(e){console.error('[EcoScan] Firebase init error:',e);}
   }
@@ -159,8 +167,13 @@
   function syncToFirestore(){
     if(!db||!currentUid||!state.onboarded) return;
     var wp=getWeekPoints();
+    // Use thumbnail for Firestore (small enough), full photo stays local
+    var syncAvatar=state.avatar;
+    if(state.avatar&&state.avatar.indexOf('data:')===0){
+      syncAvatar=state.avatarThumb||'🌱';
+    }
     db.collection('users').doc(currentUid).set({
-      name:state.name, avatar:state.avatar,
+      name:state.name, avatar:syncAvatar,
       totalPoints:state.totalPoints, totalScans:state.totalScans,
       weekPoints:wp, streak:state.streak,
       maxStreak:state.maxStreak||0,
@@ -220,12 +233,72 @@
         grid.appendChild(b);
       })(AVATARS[i]);
     }
+    // Photo upload button
+    var pb=document.createElement('button');pb.className='avatar-option avatar-photo-btn';pb.innerHTML='\ud83d\udcf7<span style="font-size:9px;display:block;">Foto</span>';pb.type='button';
+    pb.addEventListener('click',function(){
+      var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('capture','environment');
+      inp.addEventListener('change',function(){
+        if(!inp.files||!inp.files[0])return;
+        processAvatarPhoto(inp.files[0],function(dataUrl){
+          selectedAvatar=dataUrl;
+          var all=grid.querySelectorAll('.avatar-option');for(var j=0;j<all.length;j++)all[j].classList.remove('selected');
+          pb.classList.add('selected');
+          pb.style.backgroundImage='url('+dataUrl+')';pb.style.backgroundSize='cover';pb.innerHTML='';
+          if(onSelect)onSelect(dataUrl);
+        });
+      });
+      inp.click();
+    });
+    // If current avatar is a photo, show it on the button
+    if(selectedAvatar&&selectedAvatar.indexOf('data:')===0){
+      pb.classList.add('selected');pb.style.backgroundImage='url('+selectedAvatar+')';pb.style.backgroundSize='cover';pb.innerHTML='';
+    }
+    grid.appendChild(pb);
+  }
+
+  function processAvatarPhoto(file,callback){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var img=new Image();
+      img.onload=function(){
+        var s=Math.min(img.width,img.height);
+        var sx=(img.width-s)/2,sy=(img.height-s)/2;
+        // Full size for local display (128px)
+        var c=document.createElement('canvas');c.width=128;c.height=128;
+        var ctx=c.getContext('2d');
+        ctx.beginPath();ctx.arc(64,64,64,0,Math.PI*2);ctx.closePath();ctx.clip();
+        ctx.drawImage(img,sx,sy,s,s,0,0,128,128);
+        var fullUrl=c.toDataURL('image/jpeg',0.7);
+        // Tiny thumbnail for Firestore (32px, low quality ~1KB)
+        var t=document.createElement('canvas');t.width=32;t.height=32;
+        var tctx=t.getContext('2d');
+        tctx.beginPath();tctx.arc(16,16,16,0,Math.PI*2);tctx.closePath();tctx.clip();
+        tctx.drawImage(img,sx,sy,s,s,0,0,32,32);
+        var thumbUrl=t.toDataURL('image/jpeg',0.3);
+        state.avatarThumb=thumbUrl;
+        callback(fullUrl);
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function setAvatarDisplay(el,avatar){
+    el.innerHTML='';
+    if(avatar&&avatar.indexOf('data:')===0){
+      var img=document.createElement('img');img.src=avatar;img.style.cssText='width:100%;height:100%;border-radius:50%;object-fit:cover;';
+      el.appendChild(img);
+    } else {
+      el.textContent=avatar||'\ud83c\udf31';
+    }
   }
 
   function initOnboarding(){
     buildAvatarGrid('avatar-grid', function(){ checkJoin(); });
     $('input-name').addEventListener('input',checkJoin);
     $('btn-join').addEventListener('click',function(){
+      // Check registration
+      if(window._ecoscanConfig&&window._ecoscanConfig.registrationOpen===false){alert('Yeni kayıtlar şu anda kapalı!');return;}
       var n=$('input-name').value.trim();if(n.length<2||!selectedAvatar)return;
       state.name=n;state.avatar=selectedAvatar;state.onboarded=true;saveState();
       $('bottom-nav').style.display='flex';showScreen('home');
@@ -236,7 +309,7 @@
 
   // ===== HOME =====
   function renderHome(){
-    $('home-avatar').textContent=state.avatar;
+    setAvatarDisplay($('home-avatar'),state.avatar);
     $('home-greeting-text').textContent='Merhaba, '+state.name+'! 🌱';
     $('stat-total-pts').textContent=state.totalPoints;
     $('stat-today-scans').textContent=getTodayScans();
@@ -292,7 +365,9 @@
   }
 
   function selectMaterial(matId){
-    if(!canScan()){alert('\u00c7ok h\u0131zl\u0131! Biraz bekle.');return;}
+    if(window._ecoscanBanned){alert('Hesabın askıya alındı. Puan kazanamazsın.');return;}
+    if(window._ecoscanConfig&&window._ecoscanConfig.scanningEnabled===false){alert('Tarama şu anda devre dışı.');return;}
+    if(!canScan()){alert('Çok hızlı! Biraz bekle.');return;}
     var mat=getMat(matId);if(!mat)return;
     lastScanTime=Date.now();
     var cards=document.querySelectorAll('.material-card');for(var i=0;i<cards.length;i++)cards[i].classList.remove('selected');
@@ -318,6 +393,10 @@
   }
 
   // ===== LEADERBOARD =====
+  function avatarHtml(av){
+    if(av&&av.indexOf('data:')===0) return '<img src="'+av+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">';
+    return av||'\ud83c\udf31';
+  }
   function renderLeaderboard(tab){
     var list=$('lb-list');
     list.innerHTML='<p class="empty-msg">Yükleniyor...</p>';
@@ -342,26 +421,31 @@
         if(u.isUser) uIn=true;
         var dn=u.isUser?(u.name+' (Sen)'):u.name;
         var clickable=u.isMock===false?' data-lb-idx="'+i+'" style="cursor:pointer"':'';
-        h+='<div class="lb-item'+tc+uc+'"'+clickable+'><div class="lb-rank">'+rb+'</div><div class="lb-avatar">'+u.avatar+'</div><div class="lb-name">'+dn+'</div><div class="lb-pts">'+(isW?u.ptsWeek:u.ptsAll)+' pts</div></div>';
+        h+='<div class="lb-item'+tc+uc+'"'+clickable+'><div class="lb-rank">'+rb+'</div><div class="lb-avatar">'+avatarHtml(u.avatar)+'</div><div class="lb-name">'+dn+'</div><div class="lb-pts">'+(isW?u.ptsWeek:u.ptsAll)+' pts</div></div>';
       }
       if(!uIn&&state.onboarded){
         var ur=0;for(var i=0;i<all.length;i++)if(all[i].isUser){ur=i+1;break;}
         if(!ur) ur=all.length;
         h+='<div style="text-align:center;color:var(--text-muted);padding:8px;">· · ·</div>';
-        h+='<div class="lb-item current-user"><div class="lb-rank">'+ur+'</div><div class="lb-avatar">'+state.avatar+'</div><div class="lb-name">'+state.name+' (Sen)</div><div class="lb-pts">'+(isW?getWeekPoints():state.totalPoints)+' pts</div></div>';
+        h+='<div class="lb-item current-user"><div class="lb-rank">'+ur+'</div><div class="lb-avatar">'+avatarHtml(state.avatar)+'</div><div class="lb-name">'+state.name+' (Sen)</div><div class="lb-pts">'+(isW?getWeekPoints():state.totalPoints)+' pts</div></div>';
       }
       list.innerHTML=h||'<p class="empty-msg">Henüz kimse yok!</p>';
-      // Click handlers for real users
-      var clickItems=list.querySelectorAll('[data-lb-idx]');
-      for(var ci=0;ci<clickItems.length;ci++){
-        (function(el){el.addEventListener('click',function(){var idx=parseInt(el.getAttribute('data-lb-idx'));if(top[idx])showUserProfile(top[idx]);});})(clickItems[ci]);
-      }
+      // Click handlers — event delegation
+      list.onclick=function(e){
+        var item=e.target.closest('[data-lb-idx]');
+        if(!item)return;
+        var idx=parseInt(item.getAttribute('data-lb-idx'));
+        if(top[idx]){
+          console.log('[EcoScan] Profile clicked:',top[idx].name);
+          showUserProfile(top[idx]);
+        }
+      };
     });
   }
 
   function showUserProfile(user){
     var m=$('user-modal');
-    $('um-avatar').textContent=user.avatar;
+    setAvatarDisplay($('um-avatar'),user.avatar);
     $('um-name').textContent=user.name;
     $('um-pts').textContent=user.ptsAll+' puan \u00b7 '+user.ptsWeek+' haftal\u0131k';
     $('um-streak').textContent=(user.streak||0)+' g\u00fcn seri \ud83d\udd25';
@@ -374,7 +458,7 @@
   }
 
   function renderProfile(){
-    $('profile-avatar').textContent=state.avatar;
+    setAvatarDisplay($('profile-avatar'),state.avatar);
     $('profile-name').textContent=state.name;
     var lv=getLevel(state.totalPoints);
     $('profile-level').textContent=lv.name;

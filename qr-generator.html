@@ -2,244 +2,348 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EcoScan - QR Üretici</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EcoScan - Yönetim Paneli</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #F7F9F4; color: #1A2E1A; padding: 24px; }
-    .container { max-width: 540px; margin: 0 auto; }
-    h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #2D8C4E; }
-    .sub { font-size: 14px; color: #7A937A; margin-bottom: 24px; }
-    .form-group { margin-bottom: 14px; }
-    label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px; color: #4A6B4A; }
-    input { width: 100%; padding: 10px 14px; border: 2px solid #D4EDDA; border-radius: 10px; font-size: 15px; font-family: inherit; outline: none; background: #fff; }
-    input:focus { border-color: #2D8C4E; }
-    .code-display { text-align: center; margin-bottom: 14px; padding: 12px; background: #fff; border-radius: 12px; border: 2px solid #D4EDDA; }
-    .code-display .code-val { font-size: 32px; font-weight: 800; letter-spacing: 6px; font-family: 'Courier New', monospace; color: #1A6332; }
-    .code-display .code-hint { font-size: 11px; color: #7A937A; margin-top: 4px; }
-    .btn-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn { padding: 12px 24px; background: #2D8C4E; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; flex: 1; text-align: center; }
-    .btn:hover { background: #237A3F; }
-    .btn-outline { background: none; border: 2px solid #2D8C4E; color: #2D8C4E; flex: none; }
-    .btn-outline:hover { background: #F0F9F1; }
-    .qr-result { margin-top: 24px; text-align: center; display: none; }
-    .qr-result canvas { border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-    .qr-code-label { margin-top: 12px; font-size: 28px; font-weight: 800; color: #1A2E1A; letter-spacing: 4px; font-family: 'Courier New', monospace; }
-    .qr-code-hint { font-size: 12px; color: #7A937A; margin-top: 4px; }
-    .status { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
-    .status.success { display: block; background: #D4EDDA; color: #237A3F; }
-    .status.error { display: block; background: #F8D7DA; color: #842029; }
-    .presets { margin-top: 28px; border-top: 2px solid #D4EDDA; padding-top: 16px; }
-    .presets h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; color: #2D8C4E; }
-    .preset-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 10px 14px; background: #fff; border: 1px solid #D4EDDA; border-radius: 8px; margin-bottom: 6px; cursor: pointer; font-family: inherit; font-size: 13px; transition: 0.2s; }
-    .preset-btn:hover { background: #F0F9F1; border-color: #2D8C4E; }
-    .preset-code { font-family: 'Courier New', monospace; font-weight: 800; font-size: 13px; color: #1A6332; background: #D4EDDA; padding: 2px 8px; border-radius: 6px; }
-    /* Admin panel */
-    .admin-panel { display:none; margin-top:28px; border-top:2px solid #FFD700; padding-top:16px; }
-    .admin-panel.show { display:block; }
-    .admin-panel h3 { font-size:15px; font-weight:700; margin-bottom:10px; color:#DAA520; }
-    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#fff; border:1px solid #FFD700; border-radius:8px; margin-bottom:8px; }
-    .toggle-row span { font-size:13px; font-weight:600; color:#4A6B4A; }
-    .toggle-switch { position:relative; width:44px; height:24px; cursor:pointer; }
-    .toggle-switch input { opacity:0; width:0; height:0; }
-    .toggle-slider { position:absolute; top:0; left:0; right:0; bottom:0; background:#ccc; border-radius:24px; transition:0.3s; }
-    .toggle-slider:before { content:''; position:absolute; width:18px; height:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
-    .toggle-switch input:checked + .toggle-slider { background:#2D8C4E; }
-    .toggle-switch input:checked + .toggle-slider:before { transform:translateX(20px); }
-    .admin-hint { font-size:11px; color:#999; margin-top:8px; text-align:center; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#F7F9F4;color:#1A2E1A;min-height:100vh}
+    .container{max-width:540px;margin:0 auto;padding:16px}
+
+    /* LOGIN */
+    .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;padding:24px}
+    .login-screen h1{font-size:28px;color:#2D8C4E;margin-bottom:8px}
+    .login-screen p{font-size:14px;color:#7A937A;margin-bottom:24px}
+    .login-screen input{width:100%;max-width:300px;padding:14px;border:2px solid #D4EDDA;border-radius:12px;font-size:16px;font-family:inherit;text-align:center;outline:none}
+    .login-screen input:focus{border-color:#2D8C4E}
+    .login-screen .btn{margin-top:12px;width:100%;max-width:300px}
+    .login-err{color:#dc3545;font-size:13px;margin-top:8px;display:none}
+
+    /* TABS */
+    .tabs{display:flex;gap:0;margin-bottom:20px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+    .tab-btn{flex:1;padding:12px;border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;color:#7A937A;transition:0.2s}
+    .tab-btn.active{background:#2D8C4E;color:#fff}
+    .tab-content{display:none}.tab-content.active{display:block}
+
+    /* SHARED */
+    h2{font-size:20px;font-weight:700;color:#2D8C4E;margin-bottom:16px}
+    .btn{padding:12px 20px;background:#2D8C4E;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-align:center;transition:0.2s}
+    .btn:hover{background:#237A3F}
+    .btn-danger{background:#dc3545}.btn-danger:hover{background:#b02a37}
+    .btn-warn{background:#e67e22}.btn-warn:hover{background:#d35400}
+    .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+    .btn-outline{background:none;border:2px solid #2D8C4E;color:#2D8C4E}
+    .btn-outline:hover{background:#F0F9F1}
+    label{font-size:13px;font-weight:600;display:block;margin-bottom:4px;color:#4A6B4A}
+    input,select{width:100%;padding:10px 14px;border:2px solid #D4EDDA;border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:#fff}
+    input:focus{border-color:#2D8C4E}
+    .form-group{margin-bottom:14px}
+
+    /* QR */
+    .code-display{text-align:center;margin-bottom:14px;padding:12px;background:#fff;border-radius:12px;border:2px solid #D4EDDA}
+    .code-val{font-size:32px;font-weight:800;letter-spacing:6px;font-family:'Courier New',monospace;color:#1A6332}
+    .code-hint{font-size:11px;color:#7A937A;margin-top:4px}
+    .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .btn-row .btn{flex:1}
+    .qr-result{margin-top:20px;text-align:center;display:none}
+    .qr-result canvas{border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.08)}
+    .qr-code-label{margin-top:10px;font-size:24px;font-weight:800;letter-spacing:4px;font-family:'Courier New',monospace}
+    .qr-code-hint{font-size:12px;color:#7A937A;margin-top:4px}
+    .presets{margin-top:24px;border-top:2px solid #D4EDDA;padding-top:16px}
+    .presets h3{font-size:15px;font-weight:700;margin-bottom:10px;color:#2D8C4E}
+    .preset-btn{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:10px 14px;background:#fff;border:1px solid #D4EDDA;border-radius:8px;margin-bottom:6px;cursor:pointer;font-family:inherit;font-size:13px;transition:0.2s}
+    .preset-btn:hover{background:#F0F9F1;border-color:#2D8C4E}
+    .preset-code{font-family:'Courier New',monospace;font-weight:800;font-size:13px;color:#1A6332;background:#D4EDDA;padding:2px 8px;border-radius:6px}
+
+    /* ADMIN */
+    .settings-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+    .settings-card h3{font-size:14px;font-weight:700;color:#4A6B4A;margin-bottom:10px}
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0}
+    .toggle-row:last-child{border:none}
+    .toggle-row span{font-size:13px;font-weight:500;color:#1A2E1A}
+    .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer}
+    .toggle-switch input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:24px;transition:0.3s}
+    .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s}
+    .toggle-switch input:checked+.toggle-slider{background:#2D8C4E}
+    .toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px)}
+    .user-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.05);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .user-card.banned{opacity:0.5;border-left:3px solid #dc3545}
+    .uc-avatar{font-size:28px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .uc-avatar img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+    .uc-info{flex:1;min-width:120px}
+    .uc-name{font-size:14px;font-weight:700}
+    .uc-stats{font-size:11px;color:#7A937A}
+    .uc-actions{display:flex;gap:4px;flex-wrap:wrap}
+    .user-count{font-size:12px;color:#7A937A;margin-bottom:12px}
+    .status-msg{padding:10px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:12px;display:none}
+    .status-msg.show{display:block}
+    .status-msg.ok{background:#D4EDDA;color:#237A3F}
+    .status-msg.err{background:#F8D7DA;color:#842029}
+    .search-box{margin-bottom:12px}
+    .logout-btn{position:fixed;top:12px;right:12px;z-index:10}
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>🔧 EcoScan QR Üretici</h1>
-  <p class="sub">Geri dönüşüm kutuları için QR kod + kutu kodu oluştur</p>
 
-  <div class="code-display">
-    <div class="code-val" id="code-val">------</div>
-    <div class="code-hint">Otomatik oluşturulan kutu kodu</div>
-  </div>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-screen">
+  <h1>🔐 EcoScan Yönetim</h1>
+  <p>Yönetici şifresini girin</p>
+  <input type="password" id="admin-pass" placeholder="Şifre..." autocomplete="off">
+  <button class="btn" id="btn-login">Giriş Yap</button>
+  <div class="login-err" id="login-err">Yanlış şifre!</div>
+</div>
 
-  <div class="form-group">
-    <label for="binName">Kutu Adı</label>
-    <input type="text" id="binName" placeholder="Okul Bahcesi Kutusu" value="Okul Bahcesi Kutusu">
-  </div>
-  <div class="form-group">
-    <label for="location">Konum</label>
-    <input type="text" id="location" placeholder="A Blok Girisi" value="A Blok Girisi">
-  </div>
-
-  <div class="btn-row">
-    <button class="btn" id="btnGenerate">QR Üret</button>
-    <button class="btn btn-outline" id="btnNewCode">🔄 Yeni Kod</button>
-  </div>
-
-  <div class="status" id="status"></div>
-
-  <div class="qr-result" id="qr-result">
-    <canvas id="qr-canvas" width="300" height="380"></canvas>
-    <div class="qr-code-label" id="qr-code-label"></div>
-    <div class="qr-code-hint">Bu kodu çöp kutusunun üstüne yapıştırın</div>
-    <div class="btn-row" style="margin-top:12px;justify-content:center;">
-      <button class="btn" id="btnDownload" style="flex:none;">📥 PNG İndir</button>
+<!-- MAIN PANEL (hidden until login) -->
+<div id="main-panel" style="display:none">
+  <button class="btn btn-sm btn-outline logout-btn" id="btn-logout">Çıkış</button>
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="qr">🔧 QR Üretici</button>
+      <button class="tab-btn" data-tab="admin">⚙️ Yönetim</button>
     </div>
-  </div>
 
-  <div class="presets" id="presets-area">
-    <h3>Hazır Kutular (Tıkla → Otomatik Üret)</h3>
-  </div>
-
-  <!-- Hidden Admin Panel -->
-  <div class="admin-panel" id="admin-panel">
-    <h3>⚙️ Yönetici Paneli</h3>
-    <div class="toggle-row">
-      <span>Mock Veri (Sahte Kullanıcılar)</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="mockToggle">
-        <span class="toggle-slider"></span>
-      </label>
+    <!-- QR TAB -->
+    <div class="tab-content active" id="tab-qr">
+      <h2>QR Kod Üretici</h2>
+      <div class="code-display">
+        <div class="code-val" id="code-val">------</div>
+        <div class="code-hint">Otomatik oluşturulan kutu kodu</div>
+      </div>
+      <div class="form-group"><label>Kutu Adı</label><input type="text" id="binName" value="Okul Bahcesi Kutusu"></div>
+      <div class="form-group"><label>Konum</label><input type="text" id="location" value="A Blok Girisi"></div>
+      <div class="btn-row">
+        <button class="btn" id="btnGenerate">QR Üret</button>
+        <button class="btn btn-outline" id="btnNewCode" style="flex:none">🔄 Yeni Kod</button>
+      </div>
+      <div class="qr-result" id="qr-result">
+        <canvas id="qr-canvas" width="300" height="380"></canvas>
+        <div class="qr-code-label" id="qr-code-label"></div>
+        <div class="qr-code-hint">Bu kodu çöp kutusunun üstüne yapıştırın</div>
+        <div class="btn-row" style="justify-content:center;margin-top:10px">
+          <button class="btn" id="btnDownload" style="flex:none">📥 PNG İndir</button>
+        </div>
+      </div>
+      <div class="presets" id="presets-area"><h3>Hazır Kutular (Tıkla → Otomatik Üret)</h3></div>
     </div>
-    <div class="admin-hint">Başlığa 3 kez tıklayarak bu paneli açıp kapatabilirsiniz</div>
+
+    <!-- ADMIN TAB -->
+    <div class="tab-content" id="tab-admin">
+      <h2>⚙️ Yönetim Paneli</h2>
+      <div id="admin-status" class="status-msg"></div>
+
+      <div class="settings-card">
+        <h3>🌐 Genel Ayarlar</h3>
+        <div class="toggle-row">
+          <span>Yeni kayıt açık</span>
+          <label class="toggle-switch"><input type="checkbox" id="tog-reg" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span>Tarama aktif</span>
+          <label class="toggle-switch"><input type="checkbox" id="tog-scan" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span>Mock veri (sahte kullanıcılar)</span>
+          <label class="toggle-switch"><input type="checkbox" id="tog-mock"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>👥 Kullanıcılar</h3>
+        <div class="search-box"><input type="text" id="user-search" placeholder="🔍 İsim ile ara..."></div>
+        <div class="user-count" id="user-count"></div>
+        <div id="user-list"></div>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <script>
-(function() {
-  var canvas = document.getElementById('qr-canvas');
-  var ctx = canvas.getContext('2d');
-  var statusEl = document.getElementById('status');
-  var currentCode = '';
+(function(){
+  'use strict';
+  var ADMIN_PASS='ecoscan2024';
+  var firebaseConfig={apiKey:"AIzaSyBMCDH9hBJBaDk3AkSmkVpS2UeXvNujf7s",authDomain:"geri-donusum-2e08b.firebaseapp.com",projectId:"geri-donusum-2e08b",storageBucket:"geri-donusum-2e08b.firebasestorage.app",messagingSenderId:"35534864072",appId:"1:35534864072:web:bae4b79b0c25f842e0affd"};
+  var db,adminUid,allUsers=[];
 
-  // Generate random 6-char code (letters + numbers, no confusing chars)
-  function randomCode() {
-    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    var code = '';
-    for (var i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-    return code;
+  // === LOGIN ===
+  document.getElementById('btn-login').addEventListener('click',doLogin);
+  document.getElementById('admin-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+
+  function doLogin(){
+    var p=document.getElementById('admin-pass').value;
+    if(p!==ADMIN_PASS){document.getElementById('login-err').style.display='block';return;}
+    document.getElementById('login-err').style.display='none';
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-panel').style.display='block';
+    initFirebase();
   }
 
-  function showStatus(msg, type) {
-    statusEl.textContent = msg;
-    statusEl.className = 'status ' + type;
-  }
-
-  function setCode(code) {
-    currentCode = code;
-    document.getElementById('code-val').textContent = code;
-  }
-
-  function generateQR() {
-    if (!currentCode) setCode(randomCode());
-    var binName = document.getElementById('binName').value.trim();
-    var loc = document.getElementById('location').value.trim();
-
-    if (!binName) { showStatus('Kutu Adi zorunludur!', 'error'); return; }
-
-    var payload = JSON.stringify({ id: currentCode, n: binName, l: loc });
-
-    // Draw QR on canvas using API image
-    var qrImg = new Image();
-    qrImg.crossOrigin = 'anonymous';
-    var encoded = encodeURIComponent(payload);
-    qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&format=png&data=' + encoded;
-
-    qrImg.onload = function() {
-      canvas.width = 300;
-      canvas.height = 380;
-      // White bg
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, 300, 380);
-      // QR image
-      ctx.drawImage(qrImg, 20, 16, 260, 260);
-      // Code text
-      ctx.fillStyle = '#1A2E1A';
-      ctx.font = 'bold 32px Courier New, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(currentCode, 150, 318);
-      // Subtitle
-      ctx.fillStyle = '#7A937A';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.fillText('EcoScan Geri Donusum', 150, 345);
-      ctx.fillText(binName, 150, 365);
-
-      document.getElementById('qr-result').style.display = 'block';
-      document.getElementById('qr-code-label').textContent = currentCode;
-      showStatus('✅ QR kod olusturuldu!', 'success');
-    };
-
-    qrImg.onerror = function() {
-      showStatus('❌ QR olusturma hatasi. Internet baglantisini kontrol edin.', 'error');
-    };
-  }
-
-  function downloadQR() {
-    if (canvas.height < 100) { alert('Once QR uretin!'); return; }
-    var link = document.createElement('a');
-    link.download = currentCode + '_ecoscan.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }
-
-  // Generate 5 preset bins with random codes
-  function buildPresets() {
-    var names = [
-      { name: 'Okul Bahcesi Kutusu', loc: 'A Blok Girisi' },
-      { name: 'Kantin Geri Donusum', loc: 'B Blok Kantin' },
-      { name: 'Kutuphane Kutusu', loc: 'Merkez Kutuphane' },
-      { name: 'Spor Salonu Kutusu', loc: 'Spor Kompleksi' },
-      { name: 'Park Geri Donusum', loc: 'Yesil Park Girisi' }
-    ];
-    var area = document.getElementById('presets-area');
-    var h = '<h3>Hazir Kutular (Tikla → Otomatik Uret)</h3>';
-    for (var i = 0; i < names.length; i++) {
-      var code = randomCode();
-      h += '<button class="preset-btn" data-code="' + code + '" data-name="' + names[i].name + '" data-loc="' + names[i].loc + '">' +
-        '<span><strong>' + names[i].name + '</strong> — ' + names[i].loc + '</span>' +
-        '<span class="preset-code">' + code + '</span></button>';
-    }
-    area.innerHTML = h;
-
-    var btns = area.querySelectorAll('.preset-btn');
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].addEventListener('click', function() {
-        setCode(this.getAttribute('data-code'));
-        document.getElementById('binName').value = this.getAttribute('data-name');
-        document.getElementById('location').value = this.getAttribute('data-loc');
-        generateQR();
-      });
-    }
-  }
-
-  // Events
-  document.getElementById('btnGenerate').addEventListener('click', generateQR);
-  document.getElementById('btnDownload').addEventListener('click', downloadQR);
-  document.getElementById('btnNewCode').addEventListener('click', function() {
-    setCode(randomCode());
+  document.getElementById('btn-logout').addEventListener('click',function(){
+    document.getElementById('main-panel').style.display='none';
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('admin-pass').value='';
   });
 
-  // Init
+  // === TABS ===
+  var tabBtns=document.querySelectorAll('.tab-btn');
+  for(var i=0;i<tabBtns.length;i++){
+    tabBtns[i].addEventListener('click',function(){
+      for(var j=0;j<tabBtns.length;j++){tabBtns[j].classList.remove('active');document.getElementById('tab-'+tabBtns[j].getAttribute('data-tab')).classList.remove('active');}
+      this.classList.add('active');document.getElementById('tab-'+this.getAttribute('data-tab')).classList.add('active');
+      if(this.getAttribute('data-tab')==='admin')loadUsers();
+    });
+  }
+
+  // === FIREBASE ===
+  function initFirebase(){
+    try{
+      if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+      db=firebase.firestore();
+      firebase.auth().signInAnonymously().then(function(cred){
+        adminUid=cred.user.uid;
+        // Register as admin
+        db.collection('config').doc('admins').set({uids:firebase.firestore.FieldValue.arrayUnion(adminUid)},{merge:true});
+        loadSettings();
+      });
+    }catch(e){console.error(e);}
+  }
+
+  // === SETTINGS ===
+  function loadSettings(){
+    db.collection('config').doc('settings').get().then(function(doc){
+      var d=doc.exists?doc.data():{};
+      document.getElementById('tog-reg').checked=d.registrationOpen!==false;
+      document.getElementById('tog-scan').checked=d.scanningEnabled!==false;
+      document.getElementById('tog-mock').checked=localStorage.getItem('ecoscan_mock')==='1';
+    });
+  }
+
+  document.getElementById('tog-reg').addEventListener('change',function(){
+    db.collection('config').doc('settings').set({registrationOpen:this.checked},{merge:true});
+    showStatus('Kayıt '+(this.checked?'açıldı':'kapatıldı'),'ok');
+  });
+  document.getElementById('tog-scan').addEventListener('change',function(){
+    db.collection('config').doc('settings').set({scanningEnabled:this.checked},{merge:true});
+    showStatus('Tarama '+(this.checked?'aktif':'devre dışı'),'ok');
+  });
+  document.getElementById('tog-mock').addEventListener('change',function(){
+    localStorage.setItem('ecoscan_mock',this.checked?'1':'0');
+    showStatus('Mock veri '+(this.checked?'açık':'kapalı'),'ok');
+  });
+
+  // === USERS ===
+  function loadUsers(){
+    document.getElementById('user-list').innerHTML='<p style="color:#7A937A;font-size:13px">Yükleniyor...</p>';
+    db.collection('users').orderBy('totalPoints','desc').get().then(function(snap){
+      allUsers=[];
+      snap.forEach(function(doc){var d=doc.data();d._id=doc.id;allUsers.push(d);});
+      document.getElementById('user-count').textContent=allUsers.length+' kullanıcı';
+      renderUsers(allUsers);
+    });
+  }
+
+  document.getElementById('user-search').addEventListener('input',function(){
+    var q=this.value.toLowerCase();
+    var filtered=allUsers.filter(function(u){return(u.name||'').toLowerCase().indexOf(q)>=0;});
+    renderUsers(filtered);
+  });
+
+  function avatarHtml(av){
+    if(av&&av.indexOf('data:')===0)return '<img src="'+av+'">';
+    return av||'🌱';
+  }
+
+  function renderUsers(users){
+    var h='';
+    for(var i=0;i<users.length;i++){
+      var u=users[i],banned=u.banned?'banned':'';
+      h+='<div class="user-card '+banned+'">';
+      h+='<div class="uc-avatar">'+avatarHtml(u.avatar)+'</div>';
+      h+='<div class="uc-info"><div class="uc-name">'+esc(u.name||'?')+(u.banned?' 🚫':'')+'</div>';
+      h+='<div class="uc-stats">'+u.totalPoints+' pts · '+u.totalScans+' tarama · seri: '+(u.streak||0)+'</div></div>';
+      h+='<div class="uc-actions">';
+      h+='<button class="btn btn-sm btn-warn" onclick="adminAction(\'resetPts\',\''+u._id+'\')">Puan Sıfırla</button>';
+      h+='<button class="btn btn-sm btn-outline" onclick="adminAction(\'resetAvatar\',\''+u._id+'\')">Avatar Sıfırla</button>';
+      h+='<button class="btn btn-sm '+(u.banned?'btn':'btn-danger')+'" onclick="adminAction(\'ban\',\''+u._id+'\','+!u.banned+')">'+(u.banned?'Yasağı Kaldır':'Yasakla')+'</button>';
+      h+='<button class="btn btn-sm btn-danger" onclick="adminAction(\'delete\',\''+u._id+'\')">Sil</button>';
+      h+='</div></div>';
+    }
+    document.getElementById('user-list').innerHTML=h||'<p style="color:#7A937A;font-size:13px">Kullanıcı bulunamadı</p>';
+  }
+
+  function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s));return d.innerHTML;}
+
+  window.adminAction=function(action,uid,val){
+    if(action==='delete'){
+      if(!confirm('Bu kullanıcıyı silmek istediğine emin misin?'))return;
+      db.collection('users').doc(uid).delete().then(function(){showStatus('Kullanıcı silindi','ok');loadUsers();}).catch(function(e){showStatus('Hata: '+e.message,'err');});
+    }else if(action==='resetPts'){
+      if(!confirm('Puanları sıfırlamak istediğine emin misin?'))return;
+      db.collection('users').doc(uid).update({totalPoints:0,totalScans:0,weekPoints:0,streak:0,earnedBadges:[]}).then(function(){showStatus('Puanlar sıfırlandı','ok');loadUsers();}).catch(function(e){showStatus('Hata: '+e.message,'err');});
+    }else if(action==='resetAvatar'){
+      db.collection('users').doc(uid).update({avatar:'🌱'}).then(function(){showStatus('Avatar sıfırlandı','ok');loadUsers();}).catch(function(e){showStatus('Hata: '+e.message,'err');});
+    }else if(action==='ban'){
+      db.collection('users').doc(uid).update({banned:val}).then(function(){showStatus(val?'Kullanıcı yasaklandı':'Yasak kaldırıldı','ok');loadUsers();}).catch(function(e){showStatus('Hata: '+e.message,'err');});
+    }
+  };
+
+  function showStatus(msg,type){
+    var el=document.getElementById('admin-status');
+    el.textContent=msg;el.className='status-msg show '+type;
+    setTimeout(function(){el.classList.remove('show');},3000);
+  }
+
+  // === QR GENERATOR (same as before) ===
+  var canvas=document.getElementById('qr-canvas'),ctx=canvas.getContext('2d'),currentCode='';
+  function randomCode(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<6;i++)s+=c.charAt(Math.floor(Math.random()*c.length));return s;}
+  function setCode(c){currentCode=c;document.getElementById('code-val').textContent=c;}
+
+  function generateQR(){
+    var name=document.getElementById('binName').value||'Kutu';
+    var loc=document.getElementById('location').value||'';
+    var data=JSON.stringify({id:currentCode,n:name,l:loc,t:'ecoscan'});
+    var qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=240x240&data='+encodeURIComponent(data);
+    var img=new Image();img.crossOrigin='anonymous';
+    img.onload=function(){
+      canvas.width=300;canvas.height=380;
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,300,380);
+      ctx.fillStyle='#2D8C4E';ctx.fillRect(0,0,300,6);
+      ctx.drawImage(img,30,20,240,240);
+      ctx.fillStyle='#1A2E1A';ctx.font='bold 28px Courier New';ctx.textAlign='center';ctx.fillText(currentCode,150,292);
+      ctx.fillStyle='#7A937A';ctx.font='13px Inter,sans-serif';ctx.fillText(name,150,320);ctx.fillText(loc,150,340);
+      ctx.fillStyle='#2D8C4E';ctx.font='bold 11px Inter';ctx.fillText('♻️ EcoScan',150,368);
+      document.getElementById('qr-result').style.display='block';
+      document.getElementById('qr-code-label').textContent=currentCode;
+    };
+    img.onerror=function(){alert('QR oluşturma hatası');};
+    img.src=qrUrl;
+  }
+
+  document.getElementById('btnGenerate').addEventListener('click',generateQR);
+  document.getElementById('btnDownload').addEventListener('click',function(){
+    if(canvas.height<100)return;var a=document.createElement('a');a.download=currentCode+'_ecoscan.png';a.href=canvas.toDataURL('image/png');a.click();
+  });
+  document.getElementById('btnNewCode').addEventListener('click',function(){setCode(randomCode());});
+
+  function buildPresets(){
+    var names=[{name:'Okul Bahcesi Kutusu',loc:'A Blok Girisi'},{name:'Kantin Geri Donusum',loc:'B Blok Kantin'},{name:'Kutuphane Kutusu',loc:'Merkez Kutuphane'},{name:'Spor Salonu Kutusu',loc:'Spor Kompleksi'},{name:'Park Geri Donusum',loc:'Yesil Park Girisi'}];
+    var area=document.getElementById('presets-area'),h='<h3>Hazır Kutular (Tıkla → Otomatik Üret)</h3>';
+    for(var i=0;i<names.length;i++){var code=randomCode();
+      h+='<button class="preset-btn" data-code="'+code+'" data-name="'+names[i].name+'" data-loc="'+names[i].loc+'"><span><strong>'+names[i].name+'</strong> — '+names[i].loc+'</span><span class="preset-code">'+code+'</span></button>';
+    }
+    area.innerHTML=h;
+    var btns=area.querySelectorAll('.preset-btn');
+    for(var i=0;i<btns.length;i++)btns[i].addEventListener('click',function(){setCode(this.getAttribute('data-code'));document.getElementById('binName').value=this.getAttribute('data-name');document.getElementById('location').value=this.getAttribute('data-loc');generateQR();});
+  }
+
   setCode(randomCode());
   buildPresets();
-
-  // ===== ADMIN PANEL =====
-  var adminClicks = 0;
-  var adminTimer = null;
-  document.querySelector('h1').addEventListener('click', function() {
-    adminClicks++;
-    clearTimeout(adminTimer);
-    adminTimer = setTimeout(function() { adminClicks = 0; }, 1500);
-    if (adminClicks >= 3) {
-      adminClicks = 0;
-      var panel = document.getElementById('admin-panel');
-      panel.classList.toggle('show');
-    }
-  });
-
-  var mockToggle = document.getElementById('mockToggle');
-  mockToggle.checked = localStorage.getItem('ecoscan_mock') === '1';
-  mockToggle.addEventListener('change', function() {
-    localStorage.setItem('ecoscan_mock', this.checked ? '1' : '0');
-  });
 })();
 </script>
 </body>
