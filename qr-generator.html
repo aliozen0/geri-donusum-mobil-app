@@ -205,13 +205,16 @@
     try{
       if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
       db=firebase.firestore();
+      console.log('[Admin] Firebase initialized');
       firebase.auth().signInAnonymously().then(function(cred){
         adminUid=cred.user.uid;
+        console.log('[Admin] Auth OK, uid:', adminUid);
         // Register as admin
-        db.collection('config').doc('admins').set({uids:firebase.firestore.FieldValue.arrayUnion(adminUid)},{merge:true});
-        loadSettings();
-      });
-    }catch(e){console.error(e);}
+        db.collection('config').doc('admins').set({uids:firebase.firestore.FieldValue.arrayUnion(adminUid)},{merge:true})
+          .then(function(){console.log('[Admin] Admin UID registered');showStatus('Bağlantı başarılı ✓','ok');loadSettings();})
+          .catch(function(e){console.error('[Admin] Register error:',e);showStatus('Admin kayıt hatası: '+e.message,'err');});
+      }).catch(function(e){console.error('[Admin] Auth error:',e);showStatus('Giriş hatası: '+e.message,'err');});
+    }catch(e){console.error('[Admin] Init error:',e);showStatus('Firebase bağlantı hatası','err');}
   }
 
   // === SETTINGS ===
