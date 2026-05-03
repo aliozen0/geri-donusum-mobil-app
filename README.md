@@ -1,54 +1,84 @@
-# ♻️ EcoScan — Gamified Recycling App
+# ♻️ EcoScan — Gamified Recycling Platform
 
-<div align="center">
+> Çocuklar için QR kod tabanlı, oyunlaştırılmış geri dönüşüm uygulaması. Firebase ile gerçek zamanlı senkronizasyon, admin paneli ve güvenlik önlemleri ile donatılmıştır.
 
-**Çocuklar için eğlenceli, oyunlaştırılmış geri dönüşüm uygulaması**
+[![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%2B%20Auth-FFCA28?logo=firebase)](https://firebase.google.com)
+[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?logo=pwa)](https://web.dev/progressive-web-apps/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-🌍 QR Tara · 🏆 Puan Kazan · 🎖️ Rozet Topla · 📊 Sıralamada Yüksel
+## 🎯 Proje Hakkında
 
-</div>
-
----
-
-## 🎯 Nedir?
-
-EcoScan, çocukların geri dönüşüm alışkanlığı kazanmasını oyun mekaniği ile teşvik eden bir Progressive Web App'tir (PWA). Geri dönüşüm kutularındaki QR kodları tarayarak puan kazanır, rozetler toplar ve arkadaşlarıyla yarışırlar.
+EcoScan, okul ve park gibi alanlara yerleştirilen geri dönüşüm kutularındaki QR kodları tarayarak çocukların çevre bilincini artırmayı hedefler. Her tarama puan kazandırır, sıralama tablosu rekabeti teşvik eder ve rozetler motivasyon sağlar.
 
 ## ✨ Özellikler
 
-| Özellik | Açıklama |
-|---------|----------|
-| 📷 **QR Tarama** | Kamera ile geri dönüşüm kutusundaki QR kodu tara |
-| ⌨️ **Manuel Kod Girişi** | QR yoksa kutu kodunu elle gir |
-| 🏅 **18 Seviyeli Rozet** | Bronz → Gümüş → Altın → Elmas (oyun teorisi bazlı) |
-| 🔥 **Günlük Seri** | Üst üste geri dönüşüm yap, serini koru |
-| 🌳 **Çevresel Etki** | Kaç ağaç kurtardığını, CO₂ azalttığını gör |
-| 🏆 **Gerçek Zamanlı Sıralama** | Firebase ile canlı leaderboard |
-| 🎭 **12 Avatar** | Profilde istediğin zaman değiştir |
-| 📚 **Eğitici İçerik** | Her taramada malzeme hakkında bilgi |
-| 🎯 **Haftalık Görevler** | İlerleme çubuklu hedefler |
-| 🔧 **QR Üretici** | Yöneticiler için QR kod + kutu etiketi oluşturucu |
+### 🎮 Oyunlaştırma
+- **Puan Sistemi** — Malzeme bazlı puanlama (Kağıt: 10, Plastik: 15, Cam: 20, Metal: 25, Organik: 8)
+- **Seviye Sistemi** — Fidan → Ağaç → Orman → Dünya Koruyucu (5 seviye)
+- **Günlük Seri** — Ardışık gün bonusu (+5 puan)
+- **Rozetler** — İlk Adım, Hafta Yıldızı, Geri Dönüşüm Ustası vb. (8 rozet)
+- **Konfeti Animasyonu** — Her taramada kutlama efekti
 
-## 🛠️ Teknolojiler
+### 📱 Kullanıcı Deneyimi
+- **QR Tarama** — Kamera ile anında tarama
+- **Manuel Kod Girişi** — 6 haneli kutu kodu desteği
+- **Emoji + Fotoğraf Avatar** — Kamera/galeri ile profil fotoğrafı
+- **Gerçek Zamanlı Leaderboard** — Firebase ile anlık sıralama
+- **Kullanıcı Profil Modalı** — Leaderboard'dan tıklayarak profil görüntüleme
+- **Toast Bildirimleri** — Tarayıcı alert yerine şık, animasyonlu bildirimler
+- **PWA Desteği** — Ana ekrana eklenebilir
 
-- **Frontend:** Vanilla HTML, CSS, JavaScript (framework yok)
-- **Backend:** Firebase (Firestore + Anonymous Auth)
-- **QR:** html5-qrcode kütüphanesi
-- **Animasyon:** canvas-confetti
-- **Dağıtım:** Firebase Hosting / Netlify / Vercel
+### 🔐 Güvenlik
+- **Content Security Policy (CSP)** — XSS koruması
+- **Input Sanitization** — Tüm kullanıcı girdileri temizlenir
+- **Brute Force Koruması** — Kod girişi: 10/dk, tarama: 5s cooldown
+- **Firestore Rules** — Sunucu tarafı doğrulama:
+  - Puan artış limiti: max +50/yazma
+  - Tarama artış limiti: max +1/yazma
+  - Kullanıcı izolasyonu (sadece kendi verisini yazar)
+  - Banned kullanıcılar yazamaz
+- **Admin Şifre Hash** — SHA-256 ile saklanır (açık metin yok)
+- **Günlük Tarama Limiti** — Max 100 tarama/gün
+
+### ⚙️ Admin Paneli (`qr-generator.html`)
+- **Şifre Korumalı Giriş** — SHA-256 hash + brute force koruması (5 deneme)
+- **QR Kod Üretici** — Hazır şablonlar ile hızlı QR oluşturma
+- **Genel Ayarlar**:
+  - Yeni kayıt aç/kapat
+  - Tarama aç/kapat (anlık yansır)
+  - İsim değiştirme izni
+  - Avatar değiştirme izni
+- **Kullanıcı Yönetimi**:
+  - Tüm kullanıcıları listele + isimle ara
+  - Puan sıfırlama
+  - Avatar sıfırlama
+  - Kullanıcı yasaklama/yasak kaldırma
+  - Kullanıcı silme
+  - 🔄 Yenile butonu
+- **Gerçek Zamanlı Senkronizasyon** — Admin değişiklikleri kullanıcılara anında yansır
+
+## 🛠️ Teknoloji
+
+| Katman | Teknoloji |
+|--------|-----------|
+| Frontend | Vanilla HTML, CSS, JavaScript |
+| Backend | Firebase Firestore + Anonymous Auth |
+| QR | html5-qrcode |
+| Animasyon | canvas-confetti |
+| Dağıtım | Firebase Hosting |
 
 ## 🚀 Kurulum
 
 ### Gereksinimler
-- Modern bir web tarayıcısı
-- Node.js (opsiyonel, sadece local server için)
+- Modern web tarayıcısı (Chrome, Safari, Firefox)
+- Node.js (opsiyonel, local server için)
 
 ### Yerel Çalıştırma
 
 ```bash
 # Projeyi klonla
-git clone https://github.com/aliozen0/geri-donusum.git
-cd geri-donusum
+git clone https://github.com/aliozen0/geri-donusum-mobil-app.git
+cd geri-donusum-mobil-app
 
 # Yerel sunucu başlat
 npx serve -l 3000
@@ -59,7 +89,6 @@ Tarayıcıda `http://localhost:3000` adresine git.
 ### Firebase Deploy
 
 ```bash
-# Firebase CLI ile deploy
 npx firebase-tools deploy --project geri-donusum-2e08b
 ```
 
@@ -67,57 +96,69 @@ npx firebase-tools deploy --project geri-donusum-2e08b
 
 ```
 geri-donusum/
-├── index.html              # Ana uygulama
-├── app.js                  # Uygulama mantığı + Firebase entegrasyonu
-├── style.css               # Tasarım (mobile-first)
-├── qr-generator.html       # QR kod üretici (yönetici aracı)
+├── index.html              # Ana uygulama (PWA)
+├── app.js                  # Uygulama mantığı + Firebase + güvenlik
+├── style.css               # Tasarım (mobile-first, 1200+ satır)
+├── qr-generator.html       # Admin paneli + QR üretici
 ├── manifest.json           # PWA manifest
 ├── firebase.json           # Firebase konfigürasyonu
-├── firestore.rules         # Firestore güvenlik kuralları
+├── firestore.rules         # Firestore güvenlik kuralları (sıkılaştırılmış)
 ├── firestore.indexes.json  # Firestore indeksleri
-└── .firebaserc             # Firebase proje bağlantısı
+├── .firebaserc             # Firebase proje bağlantısı
+├── .gitignore              # Git ignore kuralları
+└── LICENSE                 # MIT Lisansı
 ```
 
-## 🛡️ Güvenlik
+## 🔒 Güvenlik Mimarisi
 
-| Katman | Koruma |
-|--------|--------|
-| **Firestore Rules** | Kimlik doğrulama, veri tipi kontrolü, puan/tarama artış limiti |
-| **Rate Limiting** | Server: 3s arası, Client: 5s arası, Kod: 10/dakika |
-| **Input Sanitization** | XSS engeli, regex whitelist, HTML-escape |
-| **CSP** | Content Security Policy — sadece izinli domainler |
-| **Günlük Limit** | Max 100 tarama/gün |
-| **Brute Force** | Dakikada max 10 kod denemesi |
+```
+┌─────────────────────────────────────────────────────┐
+│                    CLIENT SIDE                       │
+├─────────────────────────────────────────────────────┤
+│  CSP Header        → XSS, injection koruması         │
+│  Input Sanitize    → <script> vb. temizleme          │
+│  Rate Limiting     → 5s scan, 10/dk code, 100/gün   │
+│  SHA-256 Hash      → Admin şifresi koruması          │
+│  IIFE Scope        → Global namespace koruması       │
+├─────────────────────────────────────────────────────┤
+│                   SERVER SIDE                        │
+├─────────────────────────────────────────────────────┤
+│  Auth Guard        → Anonymous auth zorunlu          │
+│  Owner Check       → userId == auth.uid              │
+│  Increment Limit   → +50 pts, +1 scan per write     │
+│  Banned Guard      → Yasaklı kullanıcı yazamaz      │
+│  Admin RBAC        → config/* sadece admin erişimi   │
+│  Type Validation   → string, int, size kontrolleri   │
+└─────────────────────────────────────────────────────┘
+```
 
 ## 🎮 Oyun Teorisi
 
-Rozet sistemi şu prensiplere dayanır:
+| Mekanik | Açıklama | Psikolojik Etki |
+|---------|----------|-----------------|
+| Puan | Her taramada anlık ödül | Dopamin döngüsü |
+| Seviye | 5 kademeli ilerleme | Uzun vadeli motivasyon |
+| Seri | Ardışık gün bonusu | Alışkanlık oluşturma |
+| Leaderboard | Gerçek zamanlı sıralama | Sosyal rekabet |
+| Rozetler | Başarı koleksiyonu | Tamamlama dürtüsü |
+| Konfeti | Görsel kutlama | Pozitif pekiştirme |
 
-- **Progressive Difficulty** — Bronz kolay, Elmas çok zor
-- **Near-miss Effect** — "2/5 - Az kaldı!" ilerleme çubukları
-- **Collection Drive** — Tam koleksiyon tamamlama motivasyonu
-- **Loss Aversion** — Günlük seri kaybetme korkusu
-- **Social Comparison** — Gerçek zamanlı leaderboard
+## 📊 Real-Time Senkronizasyon
 
-## 🔧 Yönetici Paneli
+Uygulama `onSnapshot` listener'ları kullanarak gerçek zamanlı çalışır:
 
-QR Generator sayfasında (`qr-generator.html`):
-1. **"🔧 EcoScan QR Üretici"** başlığına **3 kez** tıkla
-2. Gizli admin paneli açılır
-3. Mock veri toggle'ı ile sahte kullanıcıları aç/kapat
-
-## 📱 Ekran Görüntüleri
-
-> Uygulamayı `localhost:3000` üzerinde açarak tüm ekranları görebilirsiniz.
+- **Admin bir kullanıcıyı yasakladığında** → Kullanıcı anında bildirim alır
+- **Tarama kapatıldığında** → Tüm kullanıcılara anında yansır
+- **Puan sıfırlandığında** → Ekran anında güncellenir
+- **Kullanıcı silindiğinde** → Otomatik onboarding'e döner
 
 ## 📄 Lisans
 
-MIT License
+Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
 
 ---
 
-<div align="center">
-
-**🌍 Dünyayı kurtarmak bir QR tarama uzağında!**
-
-</div>
+<p align="center">
+  <strong>♻️ Dünyayı birlikte kurtaralım!</strong><br>
+  <sub>Built with 💚 by <a href="https://github.com/aliozen0">Ali Özen</a></sub>
+</p>

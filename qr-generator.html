@@ -314,7 +314,10 @@
   window.adminAction=function(action,uid,val){
     if(action==='delete'){
       if(!confirm('Bu kullanıcıyı silmek istediğine emin misin?'))return;
-      db.collection('users').doc(uid).delete().then(function(){showStatus('Kullanıcı silindi','ok');loadUsers();}).catch(function(e){showStatus('Hata: '+e.message,'err');});
+      // UID'yi kara listeye ekle, sonra sil
+      db.collection('config').doc('deletedUsers').set({uids:firebase.firestore.FieldValue.arrayUnion(uid)},{merge:true}).then(function(){
+        return db.collection('users').doc(uid).delete();
+      }).then(function(){showStatus('Kullanıcı kalıcı olarak silindi','ok');loadUsers();}).catch(function(e){showStatus('Hata: '+e.message,'err');});
     }else if(action==='resetPts'){
       if(!confirm('Puanları sıfırlamak istediğine emin misin?'))return;
       db.collection('users').doc(uid).update({totalPoints:0,totalScans:0,weekPoints:0,streak:0,earnedBadges:[]}).then(function(){showStatus('Puanlar sıfırlandı','ok');loadUsers();}).catch(function(e){showStatus('Hata: '+e.message,'err');});

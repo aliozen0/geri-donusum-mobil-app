@@ -159,6 +159,24 @@
       firebase.auth().signInAnonymously().then(function(cred){
         currentUid=cred.user.uid;
         console.log('[EcoScan] Auth OK, uid:', currentUid);
+        // === BLACKLIST CHECK ===
+        db.collection('config').doc('deletedUsers').get().then(function(blDoc){
+          if(blDoc.exists && blDoc.data().uids && blDoc.data().uids.indexOf(currentUid)>=0){
+            console.log('[EcoScan] User is blacklisted');
+            state=getDefault();
+            try{localStorage.setItem('ecoscan_state',JSON.stringify(state));}catch(e){}
+            $('bottom-nav').style.display='none';
+            showScreen('onboarding');
+            showToast('Hesabın yönetici tarafından kalıcı olarak silindi.','error');
+            // Kayıt butonunu devre dışı bırak
+            var joinBtn=$('btn-join');if(joinBtn)joinBtn.disabled=true;
+            return;
+          }
+          startRealtimeListeners();
+        });
+      }).catch(function(e){console.error('[EcoScan] Auth error:',e);});
+
+      function startRealtimeListeners(){
         // === REAL-TIME: User doc listener ===
         db.collection('users').doc(currentUid).onSnapshot(function(doc){
           if(state.onboarded && !doc.exists){
@@ -204,7 +222,7 @@
             }
           }
         });
-      }).catch(function(e){console.error('[EcoScan] Auth error:',e);});
+      } // end startRealtimeListeners
     }catch(e){console.error('[EcoScan] Firebase init error:',e);}
   }
 

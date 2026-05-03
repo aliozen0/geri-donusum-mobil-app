@@ -57,6 +57,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /config/deletedUsers {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
