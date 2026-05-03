@@ -35,6 +35,19 @@
     .preset-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 10px 14px; background: #fff; border: 1px solid #D4EDDA; border-radius: 8px; margin-bottom: 6px; cursor: pointer; font-family: inherit; font-size: 13px; transition: 0.2s; }
     .preset-btn:hover { background: #F0F9F1; border-color: #2D8C4E; }
     .preset-code { font-family: 'Courier New', monospace; font-weight: 800; font-size: 13px; color: #1A6332; background: #D4EDDA; padding: 2px 8px; border-radius: 6px; }
+    /* Admin panel */
+    .admin-panel { display:none; margin-top:28px; border-top:2px solid #FFD700; padding-top:16px; }
+    .admin-panel.show { display:block; }
+    .admin-panel h3 { font-size:15px; font-weight:700; margin-bottom:10px; color:#DAA520; }
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#fff; border:1px solid #FFD700; border-radius:8px; margin-bottom:8px; }
+    .toggle-row span { font-size:13px; font-weight:600; color:#4A6B4A; }
+    .toggle-switch { position:relative; width:44px; height:24px; cursor:pointer; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; top:0; left:0; right:0; bottom:0; background:#ccc; border-radius:24px; transition:0.3s; }
+    .toggle-slider:before { content:''; position:absolute; width:18px; height:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+    .toggle-switch input:checked + .toggle-slider { background:#2D8C4E; }
+    .toggle-switch input:checked + .toggle-slider:before { transform:translateX(20px); }
+    .admin-hint { font-size:11px; color:#999; margin-top:8px; text-align:center; }
   </style>
 </head>
 <body>
@@ -74,6 +87,19 @@
 
   <div class="presets" id="presets-area">
     <h3>Hazır Kutular (Tıkla → Otomatik Üret)</h3>
+  </div>
+
+  <!-- Hidden Admin Panel -->
+  <div class="admin-panel" id="admin-panel">
+    <h3>⚙️ Yönetici Paneli</h3>
+    <div class="toggle-row">
+      <span>Mock Veri (Sahte Kullanıcılar)</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="mockToggle">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="admin-hint">Başlığa 3 kez tıklayarak bu paneli açıp kapatabilirsiniz</div>
   </div>
 </div>
 
@@ -194,6 +220,26 @@
   // Init
   setCode(randomCode());
   buildPresets();
+
+  // ===== ADMIN PANEL =====
+  var adminClicks = 0;
+  var adminTimer = null;
+  document.querySelector('h1').addEventListener('click', function() {
+    adminClicks++;
+    clearTimeout(adminTimer);
+    adminTimer = setTimeout(function() { adminClicks = 0; }, 1500);
+    if (adminClicks >= 3) {
+      adminClicks = 0;
+      var panel = document.getElementById('admin-panel');
+      panel.classList.toggle('show');
+    }
+  });
+
+  var mockToggle = document.getElementById('mockToggle');
+  mockToggle.checked = localStorage.getItem('ecoscan_mock') === '1';
+  mockToggle.addEventListener('change', function() {
+    localStorage.setItem('ecoscan_mock', this.checked ? '1' : '0');
+  });
 })();
 </script>
 </body>

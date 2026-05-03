@@ -847,22 +847,26 @@ body {
 
 .badges-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 }
 
 .badge-card {
   background: var(--white);
-  padding: 14px 8px;
+  padding: 14px 10px;
   border-radius: var(--radius-md);
   text-align: center;
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
 }
 
+.badge-card.earned {
+  background: var(--green-50);
+  border: 2px solid var(--green-200);
+}
+
 .badge-card.locked {
-  opacity: 0.45;
-  filter: grayscale(1);
+  opacity: 0.6;
 }
 
 .badge-card .badge-icon {
@@ -871,9 +875,44 @@ body {
 }
 
 .badge-card .badge-name {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.badge-card .badge-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.badge-card .badge-progress {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green-600);
+  margin-top: 4px;
+}
+
+.badge-bar {
+  height: 4px;
+  background: var(--green-100);
+  border-radius: var(--radius-full);
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.badge-bar-fill {
+  height: 100%;
+  background: var(--green-400);
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+}
+
+.level-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
 }
 
 .edit-name-btn {

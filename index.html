@@ -2,38 +2,45 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="description" content="EcoScan - Geri dönüşümü oyunlaştıran mobil uygulama. QR kod tara, puan kazan, çevreyi koru!">
-  <meta name="theme-color" content="#2D8C4E">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>EcoScan - Geri Dönüşüm Oyunu</title>
+  <meta name="description" content="Çocuklar için eğlenceli geri dönüşüm oyunu. QR tara, puan kazan, dünyayı kurtar!">
   <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2D8C4E">
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://api.qrserver.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; media-src 'self' blob:; frame-src https://*.firebaseapp.com;">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="stylesheet" href="style.css">
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js" defer></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
 </head>
 <body>
-<div class="app-container" id="app">
+
+<div class="app-container">
 
   <!-- ===== ONBOARDING ===== -->
   <div class="screen onboarding" id="screen-onboarding">
-    <div class="onboarding-logo">♻️</div>
+    <div class="onboarding-logo">🌍</div>
     <h1>EcoScan</h1>
-    <p>Geri dönüşümü oyunlaştır, çevreyi koru!</p>
-    <input class="onboarding-input" id="input-name" type="text" placeholder="Adını gir..." maxlength="20" autocomplete="off">
-    <p class="avatar-label">Avatarını seç</p>
+    <p>Geri dönüşümü oyunlaştır, dünyayı kurtar!</p>
+    <label class="avatar-label">Avatarını seç:</label>
     <div class="avatar-grid" id="avatar-grid"></div>
-    <button class="btn-primary" id="btn-join" disabled>EcoScan'e Katıl 🌱</button>
+    <input type="text" class="onboarding-input" id="input-name" placeholder="Adını yaz..." maxlength="15" autocomplete="off">
+    <button class="btn-primary" id="btn-join" disabled>Başla! 🚀</button>
   </div>
 
-  <!-- ===== HOME DASHBOARD ===== -->
+  <!-- ===== HOME ===== -->
   <div class="screen" id="screen-home">
     <div class="home-header">
       <div class="home-avatar" id="home-avatar"></div>
       <div class="home-greeting">
         <h2 id="home-greeting-text"></h2>
-        <p id="home-greeting-sub">Bugün ne geri dönüştüreceksin?</p>
+        <p>Bugün de dünyayı kurtarmaya devam! 🌍</p>
       </div>
     </div>
 
@@ -156,7 +163,11 @@
       <div class="profile-avatar" id="profile-avatar"></div>
       <h2 id="profile-name"></h2>
       <p id="profile-level"></p>
-      <button class="edit-name-btn" id="btn-edit-name">İsmi Düzenle ✏️</button>
+      <p class="level-desc" id="profile-level-desc"></p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+        <button class="edit-name-btn" id="btn-edit-name">İsmi Düzenle ✏️</button>
+        <button class="edit-name-btn" id="btn-change-avatar">Avatar Değiştir 🎭</button>
+      </div>
     </div>
     <div class="profile-stats">
       <div class="profile-stat">
@@ -173,6 +184,7 @@
       </div>
     </div>
     <h3 class="section-title">Rozetler 🎖️</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Geri dönüşüm yaparak rozet kazan! Her rozetin altında nasıl kazanılacağı yazıyor.</p>
     <div class="badges-grid" id="badges-grid"></div>
   </div>
 
@@ -215,6 +227,28 @@
       <h3>İsmi Düzenle</h3>
       <input type="text" id="edit-name-input" placeholder="Yeni isim..." maxlength="20" autocomplete="off">
       <button class="btn-primary" id="btn-save-name">Kaydet</button>
+    </div>
+  </div>
+
+  <!-- ===== AVATAR CHANGE MODAL ===== -->
+  <div class="modal-overlay" id="avatar-modal">
+    <div class="modal-sheet">
+      <h3>Avatar Seç 🎭</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Yeni avatarını seç!</p>
+      <div class="avatar-grid" id="avatar-change-grid" style="max-width:100%;margin:0 auto 16px;"></div>
+      <button class="btn-primary" id="btn-save-avatar">Avatarı Kaydet</button>
+    </div>
+  </div>
+
+  <!-- ===== USER PROFILE MODAL ===== -->
+  <div class="modal-overlay" id="user-modal">
+    <div class="modal-sheet" style="text-align:center;">
+      <div class="profile-avatar" id="um-avatar" style="margin:0 auto 10px;"></div>
+      <h3 id="um-name" style="margin:0 0 4px;"></h3>
+      <p id="um-pts" style="font-size:13px;color:var(--text-muted);margin:0 0 4px;"></p>
+      <p id="um-streak" style="font-size:13px;color:var(--green-600);margin:0 0 16px;"></p>
+      <h4 style="font-size:13px;color:var(--text-secondary);margin:0 0 10px;">Kazanılan Rozetler</h4>
+      <div class="badges-grid" id="um-badges" style="grid-template-columns:repeat(3,1fr);gap:8px;"></div>
     </div>
   </div>
 </div>
