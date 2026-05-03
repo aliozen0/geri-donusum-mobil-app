@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoScan - QR Üretici</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #F7F9F4; color: #1A2E1A; padding: 24px; }
+    .container { max-width: 540px; margin: 0 auto; }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #2D8C4E; }
+    .sub { font-size: 14px; color: #7A937A; margin-bottom: 24px; }
+    .form-group { margin-bottom: 14px; }
+    label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px; color: #4A6B4A; }
+    input { width: 100%; padding: 10px 14px; border: 2px solid #D4EDDA; border-radius: 10px; font-size: 15px; font-family: inherit; outline: none; background: #fff; }
+    input:focus { border-color: #2D8C4E; }
+    .btn-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { padding: 12px 24px; background: #2D8C4E; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
+    .btn:hover { background: #237A3F; }
+    .btn-outline { background: none; border: 2px solid #2D8C4E; color: #2D8C4E; }
+    .btn-outline:hover { background: #F0F9F1; }
+    .qr-result { margin-top: 24px; text-align: center; min-height: 40px; }
+    .qr-result img { border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); display: block; margin: 0 auto; }
+    .qr-code-label { margin-top: 12px; font-size: 28px; font-weight: 800; color: #1A2E1A; letter-spacing: 4px; font-family: 'Courier New', monospace; }
+    .qr-code-hint { font-size: 12px; color: #7A937A; margin-top: 4px; }
+    .payload { margin-top: 12px; font-size: 11px; color: #7A937A; word-break: break-all; background: #fff; padding: 10px; border-radius: 8px; display: none; }
+    .payload.visible { display: block; }
+    .status { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
+    .status.success { display: block; background: #D4EDDA; color: #237A3F; }
+    .status.error { display: block; background: #F8D7DA; color: #842029; }
+    .presets { margin-top: 28px; border-top: 2px solid #D4EDDA; padding-top: 16px; }
+    .presets h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; color: #2D8C4E; }
+    .preset-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 10px 14px; background: #fff; border: 1px solid #D4EDDA; border-radius: 8px; margin-bottom: 6px; cursor: pointer; font-family: inherit; font-size: 13px; transition: 0.2s; }
+    .preset-btn:hover { background: #F0F9F1; border-color: #2D8C4E; }
+    .preset-btn strong { color: #2D8C4E; }
+    .preset-code { font-family: 'Courier New', monospace; font-weight: 800; font-size: 14px; color: #1A6332; background: #D4EDDA; padding: 2px 8px; border-radius: 6px; }
+    .print-card { margin-top: 20px; border: 2px dashed #D4EDDA; padding: 24px; border-radius: 16px; text-align: center; background: #fff; }
+    .print-card h4 { font-size: 14px; color: #7A937A; margin-bottom: 8px; }
+    .print-card .print-qr { margin: 0 auto; }
+    .print-card .print-id { font-size: 32px; font-weight: 800; letter-spacing: 6px; font-family: 'Courier New', monospace; margin-top: 8px; }
+    .print-card .print-name { font-size: 13px; color: #4A6B4A; margin-top: 4px; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .container > *:not(.print-card) { display: none !important; }
+      .print-card { border: 2px solid #000; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔧 EcoScan QR Üretici</h1>
+  <p class="sub">Geri dönüşüm kutuları için QR kod + kutu kodu oluştur</p>
+
+  <div class="form-group">
+    <label for="binId">Kutu Kodu (6 haneli)</label>
+    <input type="text" id="binId" placeholder="ECO001" value="ECO001" maxlength="6" style="text-transform:uppercase; letter-spacing:2px; font-weight:700;">
+  </div>
+  <div class="form-group">
+    <label for="binName">Kutu Adı</label>
+    <input type="text" id="binName" placeholder="Okul Bahcesi Kutusu" value="Okul Bahcesi Kutusu">
+  </div>
+  <div class="form-group">
+    <label for="location">Konum</label>
+    <input type="text" id="location" placeholder="A Blok Girisi" value="A Blok Girisi">
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="btnGenerate">QR Üret</button>
+    <button class="btn btn-outline" id="btnDownload">İndir (PNG)</button>
+    <button class="btn btn-outline" id="btnPrint">🖨️ Yazdır</button>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div class="qr-result" id="qr-result" style="display:none;">
+    <img id="qr-img" alt="QR Code" width="280" height="280">
+    <div class="qr-code-label" id="qr-code-label"></div>
+    <div class="qr-code-hint">Bu kodu çöp kutusunun üstüne yapıştırın</div>
+  </div>
+
+  <div class="payload" id="payload-preview"></div>
+
+  <!-- Printable card -->
+  <div class="print-card" id="print-card" style="display:none;">
+    <h4>♻️ EcoScan Geri Dönüşüm Kutusu</h4>
+    <img id="print-qr-img" alt="QR" width="200" height="200" class="print-qr">
+    <div class="print-id" id="print-id"></div>
+    <div class="print-name" id="print-name"></div>
+  </div>
+
+  <div class="presets">
+    <h3>Hazır Kutular (Tıkla → Otomatik Üret)</h3>
+    <button class="preset-btn" data-id="ECO001" data-name="Okul Bahcesi Kutusu" data-loc="A Blok Girisi">
+      <span><strong>Okul Bahcesi</strong> — A Blok Girisi</span>
+      <span class="preset-code">ECO001</span>
+    </button>
+    <button class="preset-btn" data-id="ECO002" data-name="Kantin Geri Donusum" data-loc="B Blok Kantin">
+      <span><strong>Kantin</strong> — B Blok Kantin</span>
+      <span class="preset-code">ECO002</span>
+    </button>
+    <button class="preset-btn" data-id="ECO003" data-name="Kutuphane Kutusu" data-loc="Merkez Kutuphane">
+      <span><strong>Kutuphane</strong> — Merkez Kutuphane</span>
+      <span class="preset-code">ECO003</span>
+    </button>
+    <button class="preset-btn" data-id="ECO004" data-name="Spor Salonu Kutusu" data-loc="Spor Kompleksi">
+      <span><strong>Spor Salonu</strong> — Spor Kompleksi</span>
+      <span class="preset-code">ECO004</span>
+    </button>
+    <button class="preset-btn" data-id="ECO005" data-name="Park Geri Donusum" data-loc="Yesil Park Girisi">
+      <span><strong>Park</strong> — Yesil Park Girisi</span>
+      <span class="preset-code">ECO005</span>
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  var statusEl = document.getElementById('status');
+  var payloadEl = document.getElementById('payload-preview');
+  var qrResult = document.getElementById('qr-result');
+  var qrImg = document.getElementById('qr-img');
+  var printCard = document.getElementById('print-card');
+
+  function showStatus(msg, type) {
+    statusEl.textContent = msg;
+    statusEl.className = 'status ' + type;
+  }
+
+  function generateQR() {
+    var binId = document.getElementById('binId').value.trim().toUpperCase();
+    var binName = document.getElementById('binName').value.trim();
+    var loc = document.getElementById('location').value.trim();
+
+    if (!binId || !binName) {
+      showStatus('Kutu Kodu ve Kutu Adi zorunludur!', 'error');
+      return;
+    }
+
+    // Force uppercase in input
+    document.getElementById('binId').value = binId;
+
+    var payload = JSON.stringify({
+      id: binId,
+      n: binName,
+      l: loc
+    });
+
+    payloadEl.textContent = 'Payload: ' + payload;
+    payloadEl.classList.add('visible');
+
+    // Generate QR via API
+    var encoded = encodeURIComponent(payload);
+    var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encoded;
+
+    qrImg.onload = function() {
+      qrResult.style.display = 'block';
+      document.getElementById('qr-code-label').textContent = binId;
+
+      // Also update print card
+      document.getElementById('print-qr-img').src = qrUrl;
+      document.getElementById('print-id').textContent = binId;
+      document.getElementById('print-name').textContent = binName + ' — ' + loc;
+      printCard.style.display = 'block';
+
+      showStatus('✅ QR kod ve kutu kodu olusturuldu!', 'success');
+    };
+    qrImg.onerror = function() {
+      showStatus('❌ QR olusturma hatasi. Internet baglantisini kontrol edin.', 'error');
+    };
+    qrImg.src = qrUrl;
+  }
+
+  function downloadQR() {
+    if (!qrImg.src || qrImg.src === window.location.href) {
+      alert('Once QR uretin!');
+      return;
+    }
+
+    // Create a canvas to combine QR + code label
+    var canvas = document.createElement('canvas');
+    canvas.width = 350;
+    canvas.height = 420;
+    var ctx = canvas.getContext('2d');
+
+    // White background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 350, 420);
+
+    // Draw QR
+    ctx.drawImage(qrImg, 25, 20, 300, 300);
+
+    // Draw bin code
+    var binId = document.getElementById('binId').value.trim().toUpperCase();
+    ctx.fillStyle = '#1A2E1A';
+    ctx.font = 'bold 36px Courier New, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(binId, 175, 360);
+
+    // Draw hint
+    ctx.fillStyle = '#7A937A';
+    ctx.font = '13px Inter, sans-serif';
+    ctx.fillText('EcoScan Geri Donusum Kutusu', 175, 395);
+
+    // Download
+    var link = document.createElement('a');
+    link.download = binId + '_ecoscan_qr.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
+  // Event listeners
+  document.getElementById('btnGenerate').addEventListener('click', generateQR);
+  document.getElementById('btnDownload').addEventListener('click', downloadQR);
+  document.getElementById('btnPrint').addEventListener('click', function() {
+    if (printCard.style.display === 'none') {
+      alert('Once QR uretin!');
+      return;
+    }
+    window.print();
+  });
+
+  // Preset buttons
+  var presetBtns = document.querySelectorAll('.preset-btn');
+  for (var i = 0; i < presetBtns.length; i++) {
+    presetBtns[i].addEventListener('click', function() {
+      document.getElementById('binId').value = this.getAttribute('data-id');
+      document.getElementById('binName').value = this.getAttribute('data-name');
+      document.getElementById('location').value = this.getAttribute('data-loc');
+      generateQR();
+    });
+  }
+
+  // Auto generate on load
+  window.addEventListener('load', function() {
+    setTimeout(generateQR, 500);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="description" content="EcoScan - Geri dönüşümü oyunlaştıran mobil uygulama. QR kod tara, puan kazan, çevreyi koru!">
+  <meta name="theme-color" content="#2D8C4E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>EcoScan - Geri Dönüşüm Oyunu</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+<div class="app-container" id="app">
+
+  <!-- ===== ONBOARDING ===== -->
+  <div class="screen onboarding" id="screen-onboarding">
+    <div class="onboarding-logo">♻️</div>
+    <h1>EcoScan</h1>
+    <p>Geri dönüşümü oyunlaştır, çevreyi koru!</p>
+    <input class="onboarding-input" id="input-name" type="text" placeholder="Adını gir..." maxlength="20" autocomplete="off">
+    <p class="avatar-label">Avatarını seç</p>
+    <div class="avatar-grid" id="avatar-grid"></div>
+    <button class="btn-primary" id="btn-join" disabled>EcoScan'e Katıl 🌱</button>
+  </div>
+
+  <!-- ===== HOME DASHBOARD ===== -->
+  <div class="screen" id="screen-home">
+    <div class="home-header">
+      <div class="home-avatar" id="home-avatar"></div>
+      <div class="home-greeting">
+        <h2 id="home-greeting-text"></h2>
+        <p id="home-greeting-sub">Bugün ne geri dönüştüreceksin?</p>
+      </div>
+    </div>
+
+    <div class="level-card" id="level-card">
+      <div class="level-name" id="level-name"></div>
+      <div class="level-sub" id="level-sub"></div>
+      <div class="level-bar"><div class="level-bar-fill" id="level-bar-fill"></div></div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total-pts">0</div>
+        <div class="stat-label">Toplam Puan</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-today-scans">0</div>
+        <div class="stat-label">Bugün Tarama</div>
+      </div>
+    </div>
+
+    <div class="scan-btn-wrap">
+      <button class="scan-btn" id="btn-scan-home">
+        <span class="scan-icon">📷</span>
+        QR Tara
+      </button>
+    </div>
+
+    <h3 class="section-title">Son Aktiviteler</h3>
+    <div class="activity-feed" id="activity-feed">
+      <p class="empty-msg">Henüz bir aktivite yok. QR tarayarak başla!</p>
+    </div>
+  </div>
+
+  <!-- ===== QR SCANNER ===== -->
+  <div class="screen scanner-screen" id="screen-scanner">
+    <div class="scanner-header">
+      <button class="back-btn" id="btn-back-scanner" aria-label="Geri">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M14 4L6 10l8 6"/></svg>
+      </button>
+      <h2>QR Tara</h2>
+    </div>
+    <div id="qr-reader"></div>
+    <p class="scanner-hint">Geri dönüşüm kutusundaki QR kodu kameraya göster</p>
+
+    <!-- Manual test input (for desktop testing without camera) -->
+    <div class="manual-test">
+      <p class="manual-test-title">📋 Kamera yoksa manuel test:</p>
+      <textarea id="manual-qr-input" placeholder='{"binId":"bin_001","binName":"Okul Bahçesi Kutusu","location":"A Blok Girişi"}'></textarea>
+      <button class="btn-secondary" id="btn-manual-scan">Manuel Tara</button>
+    </div>
+  </div>
+
+  <!-- ===== MATERIAL SELECTION ===== -->
+  <div class="screen material-screen" id="screen-material">
+    <div class="scanner-header" style="justify-content:center;">
+      <h2>Malzeme Seç</h2>
+    </div>
+    <div class="bin-info" id="bin-info">
+      <div class="bin-name" id="bin-name"></div>
+      <div class="bin-loc" id="bin-loc"></div>
+    </div>
+    <div class="material-grid" id="material-grid"></div>
+  </div>
+
+  <!-- ===== LEADERBOARD ===== -->
+  <div class="screen" id="screen-leaderboard">
+    <h2 class="page-title">Sıralama 🏆</h2>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="week">Bu Hafta</button>
+      <button class="tab-btn" data-tab="all">Tüm Zamanlar</button>
+    </div>
+    <div class="lb-list" id="lb-list"></div>
+  </div>
+
+  <!-- ===== PROFILE ===== -->
+  <div class="screen" id="screen-profile">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profile-avatar"></div>
+      <h2 id="profile-name"></h2>
+      <p id="profile-level"></p>
+      <button class="edit-name-btn" id="btn-edit-name">İsmi Düzenle ✏️</button>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="ps-val" id="ps-pts">0</div>
+        <div class="ps-label">Puan</div>
+      </div>
+      <div class="profile-stat">
+        <div class="ps-val" id="ps-scans">0</div>
+        <div class="ps-label">Tarama</div>
+      </div>
+      <div class="profile-stat">
+        <div class="ps-val" id="ps-fav">-</div>
+        <div class="ps-label">Favori</div>
+      </div>
+    </div>
+    <h3 class="section-title">Rozetler 🎖️</h3>
+    <div class="badges-grid" id="badges-grid"></div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav" id="bottom-nav" style="display:none;">
+    <button class="nav-item active" data-screen="home" aria-label="Ana Sayfa">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Ana Sayfa
+    </button>
+    <button class="nav-item" data-screen="scanner" aria-label="Tara">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+      Tara
+    </button>
+    <button class="nav-item" data-screen="leaderboard" aria-label="Sıralama">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="14" width="4" height="7"/><rect x="10" y="8" width="4" height="13"/><rect x="16" y="11" width="4" height="10"/></svg>
+      Sıralama
+    </button>
+    <button class="nav-item" data-screen="profile" aria-label="Profil">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profil
+    </button>
+  </nav>
+
+  <!-- ===== CELEBRATION OVERLAY ===== -->
+  <div class="celebration-overlay" id="celebration">
+    <div class="cel-icon">🎉</div>
+    <div class="cel-text">Harika İş!</div>
+    <div class="cel-pts" id="cel-pts"></div>
+  </div>
+
+  <!-- ===== TUTORIAL TOOLTIP ===== -->
+  <div class="tutorial-tooltip" id="tutorial-tooltip">
+    İlk taramanı yap! Geri dönüşüm kutusundaki QR kodu tara ve puan kazan 🌍
+  </div>
+
+  <!-- ===== EDIT NAME MODAL ===== -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal-sheet">
+      <h3>İsmi Düzenle</h3>
+      <input type="text" id="edit-name-input" placeholder="Yeni isim..." maxlength="20" autocomplete="off">
+      <button class="btn-primary" id="btn-save-name">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
