@@ -178,7 +178,9 @@
 <script>
 (function(){
   'use strict';
-  var ADMIN_PASS='ecoscan2024';
+  // SHA-256 hash of admin password (not stored in plaintext)
+  var ADMIN_HASH='a293e0fae083c6286e3e52a22e4b04029e4ade4a79ee27477fa6aae2fb6b0584';
+  var loginAttempts=0;
   var firebaseConfig={apiKey:"AIzaSyBMCDH9hBJBaDk3AkSmkVpS2UeXvNujf7s",authDomain:"geri-donusum-2e08b.firebaseapp.com",projectId:"geri-donusum-2e08b",storageBucket:"geri-donusum-2e08b.firebasestorage.app",messagingSenderId:"35534864072",appId:"1:35534864072:web:bae4b79b0c25f842e0affd"};
   var db,adminUid,allUsers=[];
 
@@ -186,9 +188,13 @@
   document.getElementById('btn-login').addEventListener('click',doLogin);
   document.getElementById('admin-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 
-  function doLogin(){
+  async function sha256(str){var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');}
+
+  async function doLogin(){
+    if(loginAttempts>=5){document.getElementById('login-err').textContent='Çok fazla deneme! Sayfayı yenile.';document.getElementById('login-err').style.display='block';return;}
     var p=document.getElementById('admin-pass').value;
-    if(p!==ADMIN_PASS){document.getElementById('login-err').style.display='block';return;}
+    var hash=await sha256(p);
+    if(hash!==ADMIN_HASH){loginAttempts++;document.getElementById('login-err').textContent='Yanlış şifre! ('+loginAttempts+'/5)';document.getElementById('login-err').style.display='block';return;}
     document.getElementById('login-err').style.display='none';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('main-panel').style.display='block';

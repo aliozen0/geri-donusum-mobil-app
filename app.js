@@ -9,7 +9,9 @@
     if (!c) return;
     var t = document.createElement('div');
     t.className = 'toast ' + type;
-    t.innerHTML = '<span class="toast-icon">' + (icons[type] || '⚠️') + '</span><span class="toast-msg">' + msg + '</span>';
+    var ic = document.createElement('span'); ic.className = 'toast-icon'; ic.textContent = icons[type] || '⚠️';
+    var ms = document.createElement('span'); ms.className = 'toast-msg'; ms.textContent = msg;
+    t.appendChild(ic); t.appendChild(ms);
     c.appendChild(t);
     setTimeout(function () { t.classList.add('removing'); setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300); }, 3500);
   }
