@@ -220,10 +220,80 @@
             if(prev.scanningEnabled!==undefined && prev.scanningEnabled!==c.scanningEnabled){
               showToast(c.scanningEnabled===false?'Tarama yönetici tarafından durduruldu.':'Tarama tekrar aktif!', c.scanningEnabled===false?'warn':'success');
             }
+            // Registration toggle notification
+            if(prev.registrationOpen!==undefined && prev.registrationOpen!==c.registrationOpen){
+              showToast(c.registrationOpen===false?'Yeni kayıtlar yönetici tarafından kapatıldı.':'Kayıtlar tekrar açıldı!', c.registrationOpen===false?'warn':'success');
+            }
+            // Name change toggle notification
+            if(prev.allowNameChange!==undefined && prev.allowNameChange!==c.allowNameChange){
+              showToast(c.allowNameChange===false?'İsim değiştirme kapatıldı.':'İsim değiştirme açıldı!', c.allowNameChange===false?'warn':'success');
+            }
+            // Avatar change toggle notification
+            if(prev.allowAvatarChange!==undefined && prev.allowAvatarChange!==c.allowAvatarChange){
+              showToast(c.allowAvatarChange===false?'Avatar değiştirme kapatıldı.':'Avatar değiştirme açıldı!', c.allowAvatarChange===false?'warn':'success');
+            }
+            // Apply real-time UI updates
+            applyConfigToUI(c);
           }
         });
       } // end startRealtimeListeners
     }catch(e){console.error('[EcoScan] Firebase init error:',e);}
+  }
+
+  // ===== REAL-TIME CONFIG → UI =====
+  function applyConfigToUI(c){
+    if(!c) return;
+
+    // --- Scanning toggle ---
+    var scanBtn=$('btn-scan-home');
+    var navScanBtn=document.querySelector('.nav-item[data-screen="scanner"]');
+    if(c.scanningEnabled===false){
+      // Disable scan button on home
+      if(scanBtn){scanBtn.disabled=true;scanBtn.classList.add('disabled');}
+      if(navScanBtn){navScanBtn.classList.add('nav-disabled');}
+      // If user is currently on scanner or material screen, redirect to home
+      var activeScreen=document.querySelector('.screen.active');
+      if(activeScreen && (activeScreen.id==='screen-scanner' || activeScreen.id==='screen-material')){
+        if(qrScanner){try{qrScanner.stop();}catch(e){}qrScanner=null;}
+        showScreen('home');
+      }
+    } else {
+      if(scanBtn){scanBtn.disabled=false;scanBtn.classList.remove('disabled');}
+      if(navScanBtn){navScanBtn.classList.remove('nav-disabled');}
+    }
+
+    // --- Registration toggle ---
+    var joinBtn=$('btn-join');
+    if(joinBtn){
+      if(c.registrationOpen===false && !state.onboarded){
+        joinBtn.disabled=true;
+        joinBtn.textContent='Kayıtlar Kapalı 🔒';
+      } else if(c.registrationOpen!==false && !state.onboarded){
+        // Re-enable only if form is valid
+        checkJoin();
+        joinBtn.textContent='Başla! 🚀';
+      }
+    }
+
+    // --- Name change toggle ---
+    var editNameBtn=$('btn-edit-name');
+    if(editNameBtn){
+      if(c.allowNameChange===false){
+        editNameBtn.disabled=true;editNameBtn.classList.add('disabled');
+      } else {
+        editNameBtn.disabled=false;editNameBtn.classList.remove('disabled');
+      }
+    }
+
+    // --- Avatar change toggle ---
+    var changeAvatarBtn=$('btn-change-avatar');
+    if(changeAvatarBtn){
+      if(c.allowAvatarChange===false){
+        changeAvatarBtn.disabled=true;changeAvatarBtn.classList.add('disabled');
+      } else {
+        changeAvatarBtn.disabled=false;changeAvatarBtn.classList.remove('disabled');
+      }
+    }
   }
 
   function getEarnedBadges(){
@@ -281,6 +351,11 @@
 
   // ===== NAVIGATION =====
   function showScreen(id){
+    // Block scanner access when scanning is disabled
+    if(id==='scanner' && window._ecoscanConfig && window._ecoscanConfig.scanningEnabled===false){
+      showToast('Tarama şu anda yönetici tarafından devre dışı.','warn');
+      return;
+    }
     var s=document.querySelectorAll('.screen');for(var i=0;i<s.length;i++)s[i].classList.remove('active');
     var t=$('screen-'+id);if(t)t.classList.add('active');
     var n=document.querySelectorAll('.nav-item');for(var i=0;i<n.length;i++)n[i].classList.toggle('active',n[i].getAttribute('data-screen')===id);

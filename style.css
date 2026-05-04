@@ -1283,3 +1283,29 @@ body {
   from { opacity: 1; transform: translateY(0) scale(1); }
   to   { opacity: 0; transform: translateY(-20px) scale(0.95); }
 }
+
+/* ===== DISABLED STATES (Admin Config) ===== */
+.scan-btn.disabled,
+.scan-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
+
+.scan-btn.disabled::before,
+.scan-btn:disabled::before {
+  animation: none;
+  opacity: 0.3;
+}
+
+.nav-item.nav-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.edit-name-btn.disabled,
+.edit-name-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
