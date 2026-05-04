@@ -251,7 +251,7 @@
       lastUpdate:firebase.firestore.FieldValue.serverTimestamp()
     },{merge:true}).then(function(){
       console.log('[EcoScan] Synced to Firestore OK');
-    }).catch(function(e){console.error('[EcoScan] Sync error:',e);});
+    }).catch(function(e){console.error('[EcoScan] Sync error:',e);showToast('Senkronizasyon hatası! Yeniden dene.','error');});
   }
 
   function fetchLeaderboard(tab,callback){
