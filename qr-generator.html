@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>EcoScan - Yönetim Paneli</title>
+  <title>Dönüştür Kazan - Yönetim Paneli</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
     *{box-sizing:border-box;margin:0;padding:0}
@@ -88,7 +88,7 @@
 
 <!-- LOGIN SCREEN -->
 <div id="login-screen" class="login-screen">
-  <h1>🔐 EcoScan Yönetim</h1>
+  <h1>🔐 Dönüştür Kazan Yönetim</h1>
   <p>Yönetici şifresini girin</p>
   <input type="password" id="admin-pass" placeholder="Şifre..." autocomplete="off">
   <button class="btn" id="btn-login">Giriş Yap</button>
@@ -342,7 +342,7 @@
   function generateQR(){
     var name=document.getElementById('binName').value||'Kutu';
     var loc=document.getElementById('location').value||'';
-    var data=JSON.stringify({id:currentCode,n:name,l:loc,t:'ecoscan'});
+    var data=JSON.stringify({id:currentCode,n:name,l:loc,t:'donusturkazan'});
     var qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=240x240&data='+encodeURIComponent(data);
     var img=new Image();img.crossOrigin='anonymous';
     img.onload=function(){
@@ -352,7 +352,7 @@
       ctx.drawImage(img,30,20,240,240);
       ctx.fillStyle='#1A2E1A';ctx.font='bold 28px Courier New';ctx.textAlign='center';ctx.fillText(currentCode,150,292);
       ctx.fillStyle='#7A937A';ctx.font='13px Inter,sans-serif';ctx.fillText(name,150,320);ctx.fillText(loc,150,340);
-      ctx.fillStyle='#2D8C4E';ctx.font='bold 11px Inter';ctx.fillText('♻️ EcoScan',150,368);
+      ctx.fillStyle='#2D8C4E';ctx.font='bold 11px Inter';ctx.fillText('♻️ Dönüştür Kazan',150,368);
       document.getElementById('qr-result').style.display='block';
       document.getElementById('qr-code-label').textContent=currentCode;
     };
@@ -362,7 +362,7 @@
 
   document.getElementById('btnGenerate').addEventListener('click',generateQR);
   document.getElementById('btnDownload').addEventListener('click',function(){
-    if(canvas.height<100)return;var a=document.createElement('a');a.download=currentCode+'_ecoscan.png';a.href=canvas.toDataURL('image/png');a.click();
+    if(canvas.height<100)return;var a=document.createElement('a');a.download=currentCode+'_donusturkazan.png';a.href=canvas.toDataURL('image/png');a.click();
   });
   document.getElementById('btnNewCode').addEventListener('click',function(){setCode(randomCode());});
 

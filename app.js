@@ -1,15 +1,15 @@
-(function () {
+﻿(function () {
   'use strict';
 
   // ===== TOAST NOTIFICATION =====
   function showToast(msg, type) {
     type = type || 'warn';
-    var icons = { warn: '⚠️', error: '🚫', info: 'ℹ️', success: '✅' };
+    var icons = { warn: 'âš ï¸', error: 'ğŸš«', info: 'â„¹ï¸', success: 'âœ…' };
     var c = document.getElementById('toast-container');
     if (!c) return;
     var t = document.createElement('div');
     t.className = 'toast ' + type;
-    var ic = document.createElement('span'); ic.className = 'toast-icon'; ic.textContent = icons[type] || '⚠️';
+    var ic = document.createElement('span'); ic.className = 'toast-icon'; ic.textContent = icons[type] || 'âš ï¸';
     var ms = document.createElement('span'); ms.className = 'toast-msg'; ms.textContent = msg;
     t.appendChild(ic); t.appendChild(ms);
     c.appendChild(t);
@@ -45,59 +45,59 @@
     return typeof name === 'string' && name.length >= 1 && name.length <= 20 && !/[<>"'&]/.test(name);
   }
 
-  var AVATARS = ['🌱','🌻','🐝','🦋','🌍','🐢','🐼','🦊','🐬','🦜','🐘','🌺'];
+  var AVATARS = ['ğŸŒ±','ğŸŒ»','ğŸ','ğŸ¦‹','ğŸŒ','ğŸ¢','ğŸ¼','ğŸ¦Š','ğŸ¬','ğŸ¦œ','ğŸ˜','ğŸŒº'];
 
   var MATERIALS = [
-    { id:'kagit',   name:'Kağıt',         icon:'📄', pts:10, cssClass:'kagit',
-      info:'📚 Kağıt geri dönüşümü 1 ağacı kurtarır! Kitaplar, gazeteler ve kartonlar geri dönüştürülebilir.' },
-    { id:'plastik', name:'Plastik',        icon:'🧴', pts:15, cssClass:'plastik',
-      info:'🧴 Plastik doğada 450 yıl kalır! Pet şişeler, poşetler ve kapaklar geri dönüştürülebilir.' },
-    { id:'cam',     name:'Cam',            icon:'🫙', pts:20, cssClass:'cam',
-      info:'🫙 Cam %100 geri dönüştürülebilir ve sonsuz kez kullanılabilir! Şişeler ve kavanozlar atma!' },
-    { id:'metal',   name:'Metal',          icon:'🥫', pts:25, cssClass:'metal',
-      info:'🥫 Alüminyum kutu geri dönüşümü %95 enerji tasarrufu sağlar! Konserve kutuları da dahil.' },
-    { id:'organik', name:'Organik',        icon:'🍂', pts:10, cssClass:'organik',
-      info:'🍂 Meyve kabukları ve yemek artıkları kompost olur! Toprak için süper gübre.' },
-    { id:'pil',     name:'Pil/Elektronik', icon:'🔋', pts:30, cssClass:'pil',
-      info:'🔋 1 pil 1 milyon litre suyu kirletebilir! Pilleri asla çöpe atma, toplama kutusuna bırak.' }
+    { id:'kagit',   name:'KaÄŸÄ±t',         icon:'ğŸ“„', pts:10, cssClass:'kagit',
+      info:'ğŸ“š KaÄŸÄ±t geri dÃ¶nÃ¼ÅŸÃ¼mÃ¼ 1 aÄŸacÄ± kurtarÄ±r! Kitaplar, gazeteler ve kartonlar geri dÃ¶nÃ¼ÅŸtÃ¼rÃ¼lebilir.' },
+    { id:'plastik', name:'Plastik',        icon:'ğŸ§´', pts:15, cssClass:'plastik',
+      info:'ğŸ§´ Plastik doÄŸada 450 yÄ±l kalÄ±r! Pet ÅŸiÅŸeler, poÅŸetler ve kapaklar geri dÃ¶nÃ¼ÅŸtÃ¼rÃ¼lebilir.' },
+    { id:'cam',     name:'Cam',            icon:'ğŸ«™', pts:20, cssClass:'cam',
+      info:'ğŸ«™ Cam %100 geri dÃ¶nÃ¼ÅŸtÃ¼rÃ¼lebilir ve sonsuz kez kullanÄ±labilir! ÅiÅŸeler ve kavanozlar atma!' },
+    { id:'metal',   name:'Metal',          icon:'ğŸ¥«', pts:25, cssClass:'metal',
+      info:'ğŸ¥« AlÃ¼minyum kutu geri dÃ¶nÃ¼ÅŸÃ¼mÃ¼ %95 enerji tasarrufu saÄŸlar! Konserve kutularÄ± da dahil.' },
+    { id:'organik', name:'Organik',        icon:'ğŸ‚', pts:10, cssClass:'organik',
+      info:'ğŸ‚ Meyve kabuklarÄ± ve yemek artÄ±klarÄ± kompost olur! Toprak iÃ§in sÃ¼per gÃ¼bre.' },
+    { id:'pil',     name:'Pil/Elektronik', icon:'ğŸ”‹', pts:30, cssClass:'pil',
+      info:'ğŸ”‹ 1 pil 1 milyon litre suyu kirletebilir! Pilleri asla Ã§Ã¶pe atma, toplama kutusuna bÄ±rak.' }
   ];
 
   var LEVELS = [
-    { min:0,   max:99,    name:'🌱 Çevre Dostu',              desc:'Geri dönüşüm yolculuğun başlıyor!' },
-    { min:100, max:299,   name:'♻️ Geri Dönüşüm Kahramanı',  desc:'Harika gidiyorsun, dünya sana teşekkür eder!' },
-    { min:300, max:599,   name:'🌍 Dünya Koruyucusu',         desc:'Gerçek bir çevre savaşçısısın!' },
-    { min:600, max:99999, name:'🏆 Ekoloji Efsanesi',         desc:'Efsane oldun! Herkes seni örnek almalı!' }
+    { min:0,   max:99,    name:'ğŸŒ± Ã‡evre Dostu',              desc:'Geri dÃ¶nÃ¼ÅŸÃ¼m yolculuÄŸun baÅŸlÄ±yor!' },
+    { min:100, max:299,   name:'â™»ï¸ Geri DÃ¶nÃ¼ÅŸÃ¼m KahramanÄ±',  desc:'Harika gidiyorsun, dÃ¼nya sana teÅŸekkÃ¼r eder!' },
+    { min:300, max:599,   name:'ğŸŒ DÃ¼nya Koruyucusu',         desc:'GerÃ§ek bir Ã§evre savaÅŸÃ§Ä±sÄ±sÄ±n!' },
+    { min:600, max:99999, name:'ğŸ† Ekoloji Efsanesi',         desc:'Efsane oldun! Herkes seni Ã¶rnek almalÄ±!' }
   ];
 
   var BADGES = [
-    {id:'b1',tier:'bronz',name:'İlk Adım',icon:'👣',desc:'İlk geri dönüşümünü yap',check:function(d){return d.totalScans>=1;},progress:function(d){return Math.min(d.totalScans,1)+'/1';}},
-    {id:'b2',tier:'bronz',name:'Üçlü Başlangıç',icon:'🎯',desc:'3 geri dönüşüm yap',check:function(d){return d.totalScans>=3;},progress:function(d){return Math.min(d.totalScans,3)+'/3';}},
-    {id:'b3',tier:'bronz',name:'Puan Avcısı',icon:'💰',desc:'50 puan topla',check:function(d){return d.totalPoints>=50;},progress:function(d){return Math.min(d.totalPoints,50)+'/50';}},
-    {id:'b4',tier:'bronz',name:'İki Gün Seri',icon:'📅',desc:'2 gün üst üste tara',check:function(d){return d.maxStreak>=2;},progress:function(d){return Math.min(d.maxStreak,2)+'/2';}},
-    {id:'s1',tier:'gumus',name:'Beşli Yıldız',icon:'⭐',desc:'5 geri dönüşüm yap',check:function(d){return d.totalScans>=5;},progress:function(d){return Math.min(d.totalScans,5)+'/5';}},
-    {id:'s2',tier:'gumus',name:'Kağıt Dostu',icon:'📄',desc:'5 kağıt geri dönüştür',check:function(d){return(d.categoryCounts.kagit||0)>=5;},progress:function(d){return Math.min(d.categoryCounts.kagit||0,5)+'/5';}},
-    {id:'s3',tier:'gumus',name:'Plastik Avcısı',icon:'🧴',desc:'5 plastik geri dönüştür',check:function(d){return(d.categoryCounts.plastik||0)>=5;},progress:function(d){return Math.min(d.categoryCounts.plastik||0,5)+'/5';}},
-    {id:'s4',tier:'gumus',name:'Hafta Kahramanı',icon:'🗓️',desc:'Bir haftada 50 puan topla',check:function(d){return d.weekPoints>=50;},progress:function(d){return Math.min(d.weekPoints,50)+'/50';}},
-    {id:'s5',tier:'gumus',name:'Çeşitçi',icon:'🌈',desc:'3 farklı malzeme dönüştür',check:function(d){var c=0;for(var k in d.categoryCounts)if(d.categoryCounts[k]>0)c++;return c>=3;},progress:function(d){var c=0;for(var k in d.categoryCounts)if(d.categoryCounts[k]>0)c++;return Math.min(c,3)+'/3';}},
-    {id:'g1',tier:'altin',name:'Cam Ustası',icon:'🫙',desc:'10 cam geri dönüştür',check:function(d){return(d.categoryCounts.cam||0)>=10;},progress:function(d){return Math.min(d.categoryCounts.cam||0,10)+'/10';}},
-    {id:'g2',tier:'altin',name:'Seri Ustası',icon:'🔥',desc:'5 gün üst üste tara',check:function(d){return d.maxStreak>=5;},progress:function(d){return Math.min(d.maxStreak,5)+'/5';}},
-    {id:'g3',tier:'altin',name:'200 Kulübü',icon:'🏅',desc:'200 puan topla',check:function(d){return d.totalPoints>=200;},progress:function(d){return Math.min(d.totalPoints,200)+'/200';}},
-    {id:'g4',tier:'altin',name:'Metal Uzmanı',icon:'🥫',desc:'10 metal geri dönüştür',check:function(d){return(d.categoryCounts.metal||0)>=10;},progress:function(d){return Math.min(d.categoryCounts.metal||0,10)+'/10';}},
-    {id:'g5',tier:'altin',name:'Pil Koruyucu',icon:'🔋',desc:'10 pil geri dönüştür',check:function(d){return(d.categoryCounts.pil||0)>=10;},progress:function(d){return Math.min(d.categoryCounts.pil||0,10)+'/10';}},
-    {id:'d1',tier:'elmas',name:'50 Tarama',icon:'🌟',desc:'50 toplam geri dönüşüm',check:function(d){return d.totalScans>=50;},progress:function(d){return Math.min(d.totalScans,50)+'/50';}},
-    {id:'d2',tier:'elmas',name:'500 Kulübü',icon:'💫',desc:'500 puan topla',check:function(d){return d.totalPoints>=500;},progress:function(d){return Math.min(d.totalPoints,500)+'/500';}},
-    {id:'d3',tier:'elmas',name:'10 Gün Seri',icon:'🔥',desc:'10 gün üst üste tara',check:function(d){return d.maxStreak>=10;},progress:function(d){return Math.min(d.maxStreak,10)+'/10';}},
-    {id:'d4',tier:'elmas',name:'Tam Koleksiyon',icon:'👑',desc:'6 farklı malzeme dönüştür',check:function(d){var c=0;for(var k in d.categoryCounts)if(d.categoryCounts[k]>0)c++;return c>=6;},progress:function(d){var c=0;for(var k in d.categoryCounts)if(d.categoryCounts[k]>0)c++;return Math.min(c,6)+'/6';}}
+    {id:'b1',tier:'bronz',name:'Ä°lk AdÄ±m',icon:'ğŸ‘£',desc:'Ä°lk geri dÃ¶nÃ¼ÅŸÃ¼mÃ¼nÃ¼ yap',check:function(d){return d.totalScans>=1;},progress:function(d){return Math.min(d.totalScans,1)+'/1';}},
+    {id:'b2',tier:'bronz',name:'ÃœÃ§lÃ¼ BaÅŸlangÄ±Ã§',icon:'ğŸ¯',desc:'3 geri dÃ¶nÃ¼ÅŸÃ¼m yap',check:function(d){return d.totalScans>=3;},progress:function(d){return Math.min(d.totalScans,3)+'/3';}},
+    {id:'b3',tier:'bronz',name:'Puan AvcÄ±sÄ±',icon:'ğŸ’°',desc:'50 puan topla',check:function(d){return d.totalPoints>=50;},progress:function(d){return Math.min(d.totalPoints,50)+'/50';}},
+    {id:'b4',tier:'bronz',name:'Ä°ki GÃ¼n Seri',icon:'ğŸ“…',desc:'2 gÃ¼n Ã¼st Ã¼ste tara',check:function(d){return d.maxStreak>=2;},progress:function(d){return Math.min(d.maxStreak,2)+'/2';}},
+    {id:'s1',tier:'gumus',name:'BeÅŸli YÄ±ldÄ±z',icon:'â­',desc:'5 geri dÃ¶nÃ¼ÅŸÃ¼m yap',check:function(d){return d.totalScans>=5;},progress:function(d){return Math.min(d.totalScans,5)+'/5';}},
+    {id:'s2',tier:'gumus',name:'KaÄŸÄ±t Dostu',icon:'ğŸ“„',desc:'5 kaÄŸÄ±t geri dÃ¶nÃ¼ÅŸtÃ¼r',check:function(d){return(d.categoryCounts.kagit||0)>=5;},progress:function(d){return Math.min(d.categoryCounts.kagit||0,5)+'/5';}},
+    {id:'s3',tier:'gumus',name:'Plastik AvcÄ±sÄ±',icon:'ğŸ§´',desc:'5 plastik geri dÃ¶nÃ¼ÅŸtÃ¼r',check:function(d){return(d.categoryCounts.plastik||0)>=5;},progress:function(d){return Math.min(d.categoryCounts.plastik||0,5)+'/5';}},
+    {id:'s4',tier:'gumus',name:'Hafta KahramanÄ±',icon:'ğŸ—“ï¸',desc:'Bir haftada 50 puan topla',check:function(d){return d.weekPoints>=50;},progress:function(d){return Math.min(d.weekPoints,50)+'/50';}},
+    {id:'s5',tier:'gumus',name:'Ã‡eÅŸitÃ§i',icon:'ğŸŒˆ',desc:'3 farklÄ± malzeme dÃ¶nÃ¼ÅŸtÃ¼r',check:function(d){var c=0;for(var k in d.categoryCounts)if(d.categoryCounts[k]>0)c++;return c>=3;},progress:function(d){var c=0;for(var k in d.categoryCounts)if(d.categoryCounts[k]>0)c++;return Math.min(c,3)+'/3';}},
+    {id:'g1',tier:'altin',name:'Cam UstasÄ±',icon:'ğŸ«™',desc:'10 cam geri dÃ¶nÃ¼ÅŸtÃ¼r',check:function(d){return(d.categoryCounts.cam||0)>=10;},progress:function(d){return Math.min(d.categoryCounts.cam||0,10)+'/10';}},
+    {id:'g2',tier:'altin',name:'Seri UstasÄ±',icon:'ğŸ”¥',desc:'5 gÃ¼n Ã¼st Ã¼ste tara',check:function(d){return d.maxStreak>=5;},progress:function(d){return Math.min(d.maxStreak,5)+'/5';}},
+    {id:'g3',tier:'altin',name:'200 KulÃ¼bÃ¼',icon:'ğŸ…',desc:'200 puan topla',check:function(d){return d.totalPoints>=200;},progress:function(d){return Math.min(d.totalPoints,200)+'/200';}},
+    {id:'g4',tier:'altin',name:'Metal UzmanÄ±',icon:'ğŸ¥«',desc:'10 metal geri dÃ¶nÃ¼ÅŸtÃ¼r',check:function(d){return(d.categoryCounts.metal||0)>=10;},progress:function(d){return Math.min(d.categoryCounts.metal||0,10)+'/10';}},
+    {id:'g5',tier:'altin',name:'Pil Koruyucu',icon:'ğŸ”‹',desc:'10 pil geri dÃ¶nÃ¼ÅŸtÃ¼r',check:function(d){return(d.categoryCounts.pil||0)>=10;},progress:function(d){return Math.min(d.categoryCounts.pil||0,10)+'/10';}},
+    {id:'d1',tier:'elmas',name:'50 Tarama',icon:'ğŸŒŸ',desc:'50 toplam geri dÃ¶nÃ¼ÅŸÃ¼m',check:function(d){return d.totalScans>=50;},progress:function(d){return Math.min(d.totalScans,50)+'/50';}},
+    {id:'d2',tier:'elmas',name:'500 KulÃ¼bÃ¼',icon:'ğŸ’«',desc:'500 puan topla',check:function(d){return d.totalPoints>=500;},progress:function(d){return Math.min(d.totalPoints,500)+'/500';}},
+    {id:'d3',tier:'elmas',name:'10 GÃ¼n Seri',icon:'ğŸ”¥',desc:'10 gÃ¼n Ã¼st Ã¼ste tara',check:function(d){return d.maxStreak>=10;},progress:function(d){return Math.min(d.maxStreak,10)+'/10';}},
+    {id:'d4',tier:'elmas',name:'Tam Koleksiyon',icon:'ğŸ‘‘',desc:'6 farklÄ± malzeme dÃ¶nÃ¼ÅŸtÃ¼r',check:function(d){var c=0;for(var k in d.categoryCounts)if(d.categoryCounts[k]>0)c++;return c>=6;},progress:function(d){var c=0;for(var k in d.categoryCounts)if(d.categoryCounts[k]>0)c++;return Math.min(c,6)+'/6';}}
   ];
-  var TIER_INFO={bronz:{label:'🥉 Bronz',color:'#CD7F32'},gumus:{label:'🥈 Gümüş',color:'#8A8A8A'},altin:{label:'🥇 Altın',color:'#DAA520'},elmas:{label:'💎 Elmas',color:'#00BCD4'}};
+  var TIER_INFO={bronz:{label:'ğŸ¥‰ Bronz',color:'#CD7F32'},gumus:{label:'ğŸ¥ˆ GÃ¼mÃ¼ÅŸ',color:'#8A8A8A'},altin:{label:'ğŸ¥‡ AltÄ±n',color:'#DAA520'},elmas:{label:'ğŸ’ Elmas',color:'#00BCD4'}};
   var TIER_ORDER=['bronz','gumus','altin','elmas'];
 
   var MOCK_USERS = [
-    {name:'Ayşe K.',avatar:'🌻',ptsAll:1240,ptsWeek:320},{name:'Mert B.',avatar:'🐝',ptsAll:980,ptsWeek:210},
-    {name:'Zeynep A.',avatar:'🦋',ptsAll:870,ptsWeek:180},{name:'Burak T.',avatar:'🌍',ptsAll:720,ptsWeek:150},
-    {name:'Elif S.',avatar:'🐢',ptsAll:650,ptsWeek:140},{name:'Can M.',avatar:'🌱',ptsAll:520,ptsWeek:110},
-    {name:'Selin D.',avatar:'🌻',ptsAll:410,ptsWeek:90},{name:'Oğuz R.',avatar:'🐝',ptsAll:330,ptsWeek:70},
-    {name:'Deniz Y.',avatar:'🦋',ptsAll:220,ptsWeek:55}
+    {name:'AyÅŸe K.',avatar:'ğŸŒ»',ptsAll:1240,ptsWeek:320},{name:'Mert B.',avatar:'ğŸ',ptsAll:980,ptsWeek:210},
+    {name:'Zeynep A.',avatar:'ğŸ¦‹',ptsAll:870,ptsWeek:180},{name:'Burak T.',avatar:'ğŸŒ',ptsAll:720,ptsWeek:150},
+    {name:'Elif S.',avatar:'ğŸ¢',ptsAll:650,ptsWeek:140},{name:'Can M.',avatar:'ğŸŒ±',ptsAll:520,ptsWeek:110},
+    {name:'Selin D.',avatar:'ğŸŒ»',ptsAll:410,ptsWeek:90},{name:'OÄŸuz R.',avatar:'ğŸ',ptsAll:330,ptsWeek:70},
+    {name:'Deniz Y.',avatar:'ğŸ¦‹',ptsAll:220,ptsWeek:55}
   ];
 
   var BIN_DB = {
@@ -107,16 +107,16 @@
   };
 
   var FUN_FACTS = [
-    '🌳 1 ton kağıt geri dönüştürmek 17 ağaç kurtarır!',
-    '🧴 Bir plastik şişe doğada 450 yıl kalır!',
-    '🫙 Cam sonsuz kez geri dönüştürülebilir!',
-    '🥫 Alüminyum geri dönüşümü %95 enerji tasarrufu sağlar!',
-    '💧 1 kg kağıt geri dönüşümü 26 litre su kurtarır!',
-    '🔋 1 pil 1 milyon litre suyu kirletebilir!',
-    '🌍 Geri dönüşümle sera gazı %30 azalır!',
-    '🐢 Deniz kaplumbağaları plastik poşetleri denizanası sanır!',
-    '🌱 Her geri dönüşüm dünyayı biraz daha yeşil yapar!',
-    '♻️ Türkiye\'de yılda 31 milyon ton atık üretiliyor!'
+    'ğŸŒ³ 1 ton kaÄŸÄ±t geri dÃ¶nÃ¼ÅŸtÃ¼rmek 17 aÄŸaÃ§ kurtarÄ±r!',
+    'ğŸ§´ Bir plastik ÅŸiÅŸe doÄŸada 450 yÄ±l kalÄ±r!',
+    'ğŸ«™ Cam sonsuz kez geri dÃ¶nÃ¼ÅŸtÃ¼rÃ¼lebilir!',
+    'ğŸ¥« AlÃ¼minyum geri dÃ¶nÃ¼ÅŸÃ¼mÃ¼ %95 enerji tasarrufu saÄŸlar!',
+    'ğŸ’§ 1 kg kaÄŸÄ±t geri dÃ¶nÃ¼ÅŸÃ¼mÃ¼ 26 litre su kurtarÄ±r!',
+    'ğŸ”‹ 1 pil 1 milyon litre suyu kirletebilir!',
+    'ğŸŒ Geri dÃ¶nÃ¼ÅŸÃ¼mle sera gazÄ± %30 azalÄ±r!',
+    'ğŸ¢ Deniz kaplumbaÄŸalarÄ± plastik poÅŸetleri denizanasÄ± sanÄ±r!',
+    'ğŸŒ± Her geri dÃ¶nÃ¼ÅŸÃ¼m dÃ¼nyayÄ± biraz daha yeÅŸil yapar!',
+    'â™»ï¸ TÃ¼rkiye\'de yÄ±lda 31 milyon ton atÄ±k Ã¼retiliyor!'
   ];
 
   var state = loadState();
@@ -167,8 +167,8 @@
             try{localStorage.setItem('ecoscan_state',JSON.stringify(state));}catch(e){}
             $('bottom-nav').style.display='none';
             showScreen('onboarding');
-            showToast('Hesabın yönetici tarafından kalıcı olarak silindi.','error');
-            // Kayıt butonunu devre dışı bırak
+            showToast('HesabÄ±n yÃ¶netici tarafÄ±ndan kalÄ±cÄ± olarak silindi.','error');
+            // KayÄ±t butonunu devre dÄ±ÅŸÄ± bÄ±rak
             var joinBtn=$('btn-join');if(joinBtn)joinBtn.disabled=true;
             return;
           }
@@ -192,7 +192,7 @@
             var wasBanned=window._ecoscanBanned;
             if(d.banned){
               window._ecoscanBanned=true;
-              if(!wasBanned) showToast('Hesabın yönetici tarafından askıya alındı.','error');
+              if(!wasBanned) showToast('HesabÄ±n yÃ¶netici tarafÄ±ndan askÄ±ya alÄ±ndÄ±.','error');
             } else {
               window._ecoscanBanned=false;
             }
@@ -207,7 +207,7 @@
             if(state.onboarded){try{renderHome();renderProfile();}catch(e){}}
           }
         });
-        // İlk sync
+        // Ä°lk sync
         if(state.onboarded) syncToFirestore();
 
         // === REAL-TIME: Config listener ===
@@ -218,7 +218,7 @@
             var c=doc.data();
             // Scanning toggle notification
             if(prev.scanningEnabled!==undefined && prev.scanningEnabled!==c.scanningEnabled){
-              showToast(c.scanningEnabled===false?'Tarama yönetici tarafından durduruldu.':'Tarama tekrar aktif!', c.scanningEnabled===false?'warn':'success');
+              showToast(c.scanningEnabled===false?'Tarama yÃ¶netici tarafÄ±ndan durduruldu.':'Tarama tekrar aktif!', c.scanningEnabled===false?'warn':'success');
             }
           }
         });
@@ -239,7 +239,7 @@
     // Use thumbnail for Firestore (small enough), full photo stays local
     var syncAvatar=state.avatar;
     if(state.avatar&&state.avatar.indexOf('data:')===0){
-      syncAvatar=state.avatarThumb||'🌱';
+      syncAvatar=state.avatarThumb||'ğŸŒ±';
     }
     db.collection('users').doc(currentUid).set({
       name:state.name, avatar:syncAvatar,
@@ -261,7 +261,7 @@
       var list=[];
       snap.forEach(function(doc){
         var d=doc.data();
-        list.push({uid:doc.id,name:d.name||'?',avatar:d.avatar||'🌱',ptsAll:d.totalPoints||0,ptsWeek:d.weekPoints||0,streak:d.streak||0,earnedBadges:d.earnedBadges||[],isUser:doc.id===currentUid,isMock:false});
+        list.push({uid:doc.id,name:d.name||'?',avatar:d.avatar||'ğŸŒ±',ptsAll:d.totalPoints||0,ptsWeek:d.weekPoints||0,streak:d.streak||0,earnedBadges:d.earnedBadges||[],isUser:doc.id===currentUid,isMock:false});
       });
       callback(list);
     }).catch(function(e){console.error('[EcoScan] Fetch error:',e);callback([]);});
@@ -275,7 +275,7 @@
   function getLevelProgress(p){var l=getLevel(p);return Math.min(((p-l.min)/(l.max-l.min+1))*100,100);}
   function getNextLevel(p){var l=getLevel(p);for(var i=0;i<LEVELS.length;i++)if(LEVELS[i]===l&&i<LEVELS.length-1)return LEVELS[i+1];return null;}
   function getFavCat(){var cc=state.categoryCounts,m=0,f='';for(var k in cc)if(cc[k]>m){m=cc[k];f=k;}if(!f)return'-';for(var i=0;i<MATERIALS.length;i++)if(MATERIALS[i].id===f)return MATERIALS[i].name;return'-';}
-  function timeAgo(d){var dm=Math.floor((new Date()-new Date(d))/60000);if(dm<1)return'Az önce';if(dm<60)return dm+' dk önce';var dh=Math.floor(dm/60);if(dh<24)return dh+' saat önce';return Math.floor(dh/24)+' gün önce';}
+  function timeAgo(d){var dm=Math.floor((new Date()-new Date(d))/60000);if(dm<1)return'Az Ã¶nce';if(dm<60)return dm+' dk Ã¶nce';var dh=Math.floor(dm/60);if(dh<24)return dh+' saat Ã¶nce';return Math.floor(dh/24)+' gÃ¼n Ã¶nce';}
   function getMat(id){for(var i=0;i<MATERIALS.length;i++)if(MATERIALS[i].id===id)return MATERIALS[i];return MATERIALS[0];}
   function updateStreak(){var today=todayStr();if(state.lastScanDate===today)return;var y=new Date(Date.now()-864e5).toISOString().slice(0,10);state.streak=(state.lastScanDate===y)?state.streak+1:1;if(state.streak>state.maxStreak)state.maxStreak=state.streak;state.lastScanDate=today;}
 
@@ -367,7 +367,7 @@
     $('input-name').addEventListener('input',checkJoin);
     $('btn-join').addEventListener('click',function(){
       // Check registration
-      if(window._ecoscanConfig&&window._ecoscanConfig.registrationOpen===false){showToast('Yeni kayıtlar şu anda kapalı!','error');return;}
+      if(window._ecoscanConfig&&window._ecoscanConfig.registrationOpen===false){showToast('Yeni kayÄ±tlar ÅŸu anda kapalÄ±!','error');return;}
       var n=$('input-name').value.trim();if(n.length<2||!selectedAvatar)return;
       state.name=n;state.avatar=selectedAvatar;state.onboarded=true;saveState();
       $('bottom-nav').style.display='flex';showScreen('home');
@@ -379,7 +379,7 @@
   // ===== HOME =====
   function renderHome(){
     setAvatarDisplay($('home-avatar'),state.avatar);
-    $('home-greeting-text').textContent='Merhaba, '+state.name+'! 🌱';
+    $('home-greeting-text').textContent='Merhaba, '+state.name+'! ğŸŒ±';
     $('stat-total-pts').textContent=state.totalPoints;
     $('stat-today-scans').textContent=getTodayScans();
     var lv=getLevel(state.totalPoints),nx=getNextLevel(state.totalPoints);
@@ -387,34 +387,34 @@
     $('level-sub').textContent=nx?'Sonraki: '+nx.name+' ('+nx.min+' puan)':'Maksimum seviye!';
     $('level-bar-fill').style.width=getLevelProgress(state.totalPoints)+'%';
     var sc=$('streak-card');
-    if(state.streak>=2){sc.style.display='flex';$('streak-count').textContent=state.streak+' gün seri! 🔥';}else{sc.style.display='none';}
+    if(state.streak>=2){sc.style.display='flex';$('streak-count').textContent=state.streak+' gÃ¼n seri! ğŸ”¥';}else{sc.style.display='none';}
     var ts=state.totalScans;
     $('eco-trees').textContent=(ts*0.02).toFixed(1);$('eco-co2').textContent=(ts*0.5).toFixed(1)+' kg';$('eco-water').textContent=(ts*2.6).toFixed(0)+' L';
     var ws=getWeekScans(),goal=5;if(ws>=5)goal=10;if(ws>=10)goal=20;
-    $('ch-title').textContent='Haftalık Görev: '+goal+' tarama yap!';
-    $('ch-progress').textContent=Math.min(ws,goal)+'/'+goal+' tamamlandı'+(ws>=goal?' ✅':'');
+    $('ch-title').textContent='HaftalÄ±k GÃ¶rev: '+goal+' tarama yap!';
+    $('ch-progress').textContent=Math.min(ws,goal)+'/'+goal+' tamamlandÄ±'+(ws>=goal?' âœ…':'');
     $('ch-bar-fill').style.width=Math.min((ws/goal)*100,100)+'%';
     var feed=$('activity-feed'),recent=state.activities.slice(-5).reverse();
-    if(!recent.length){feed.innerHTML='<p class="empty-msg">Henüz aktivite yok. QR tarayarak başla!</p>';return;}
+    if(!recent.length){feed.innerHTML='<p class="empty-msg">HenÃ¼z aktivite yok. QR tarayarak baÅŸla!</p>';return;}
     var h='';for(var i=0;i<recent.length;i++){var a=recent[i],m=getMat(a.category);
-      h+='<div class="activity-item"><div class="activity-icon '+m.cssClass+'">'+m.icon+'</div><div class="activity-info"><div class="activity-title">'+m.name+' geri dönüştürüldü</div><div class="activity-sub">'+(a.binName||'Kutu')+' · '+timeAgo(a.timestamp)+'</div></div><div class="activity-pts">+'+a.pts+'</div></div>';
+      h+='<div class="activity-item"><div class="activity-icon '+m.cssClass+'">'+m.icon+'</div><div class="activity-info"><div class="activity-title">'+m.name+' geri dÃ¶nÃ¼ÅŸtÃ¼rÃ¼ldÃ¼</div><div class="activity-sub">'+(a.binName||'Kutu')+' Â· '+timeAgo(a.timestamp)+'</div></div><div class="activity-pts">+'+a.pts+'</div></div>';
     }feed.innerHTML=h;
   }
 
   // ===== SCANNER =====
   function startScanner(){
     var reader=$('qr-reader');reader.innerHTML='';
-    if(typeof Html5Qrcode==='undefined'){reader.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#fff;padding:20px;text-align:center;font-size:14px;">Kamera yüklenemedi. Kutu kodunu aşağıya girin.</div>';return;}
-    try{qrScanner=new Html5Qrcode('qr-reader');qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:220,height:220}},function(txt){handleQRResult(txt);},function(){}).catch(function(){reader.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#fff;padding:20px;text-align:center;font-size:14px;">Kamera bulunamadı.<br>Kutu kodunu aşağıya girin.</div>';});}catch(e){}
+    if(typeof Html5Qrcode==='undefined'){reader.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#fff;padding:20px;text-align:center;font-size:14px;">Kamera yÃ¼klenemedi. Kutu kodunu aÅŸaÄŸÄ±ya girin.</div>';return;}
+    try{qrScanner=new Html5Qrcode('qr-reader');qrScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:220,height:220}},function(txt){handleQRResult(txt);},function(){}).catch(function(){reader.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#fff;padding:20px;text-align:center;font-size:14px;">Kamera bulunamadÄ±.<br>Kutu kodunu aÅŸaÄŸÄ±ya girin.</div>';});}catch(e){}
   }
   function handleQRResult(text){
     try{var d=JSON.parse(text);var id=sanitize(d.id||d.binId||''),n=sanitize(d.n||d.binName||''),l=sanitize(d.l||d.location||'');
     if(id&&n){if(qrScanner){try{qrScanner.stop();}catch(e){}qrScanner=null;}currentBin={id:id,binName:n,location:l};showMaterialSelection(currentBin);}}catch(e){}
   }
   function handleCodeInput(code){
-    if(!canEnterCode()){showToast('Çok fazla deneme! 1 dakika bekle.','warn');return;}
+    if(!canEnterCode()){showToast('Ã‡ok fazla deneme! 1 dakika bekle.','warn');return;}
     code=code.toUpperCase().trim().replace(/[^A-Z0-9]/g,'');
-    if(!isValidCode(code)){showToast('Geçerli bir kutu kodu gir! Örnek: R7K2M9','warn');return;}
+    if(!isValidCode(code)){showToast('GeÃ§erli bir kutu kodu gir! Ã–rnek: R7K2M9','warn');return;}
     var bin=BIN_DB[code];
     currentBin=bin?{id:code,binName:sanitize(bin.n),location:sanitize(bin.l)}:{id:code,binName:'Geri Donusum Kutusu #'+code,location:'Konum bilinmiyor'};
     if(qrScanner){try{qrScanner.stop();}catch(e){}qrScanner=null;}
@@ -423,7 +423,7 @@
 
   // ===== MATERIAL SELECTION =====
   function showMaterialSelection(bin){
-    $('bin-name').textContent=bin.binName;$('bin-loc').textContent='📍 '+(bin.location||'');
+    $('bin-name').textContent=bin.binName;$('bin-loc').textContent='ğŸ“ '+(bin.location||'');
     var grid=$('material-grid'),h='';
     for(var i=0;i<MATERIALS.length;i++){var m=MATERIALS[i];
       h+='<div class="material-card" data-mat-id="'+m.id+'"><div class="mat-icon">'+m.icon+'</div><div class="mat-name">'+m.name+'</div><div class="mat-pts">+'+m.pts+' puan</div></div>';
@@ -434,16 +434,16 @@
   }
 
   function selectMaterial(matId){
-    if(window._ecoscanBanned){showToast('Hesabın askıya alındı. Puan kazanamazsın.','error');return;}
-    if(window._ecoscanConfig&&window._ecoscanConfig.scanningEnabled===false){showToast('Tarama şu anda devre dışı.','warn');return;}
-    if(!canScan()){showToast('Çok hızlı! Biraz bekle.','warn');return;}
+    if(window._ecoscanBanned){showToast('HesabÄ±n askÄ±ya alÄ±ndÄ±. Puan kazanamazsÄ±n.','error');return;}
+    if(window._ecoscanConfig&&window._ecoscanConfig.scanningEnabled===false){showToast('Tarama ÅŸu anda devre dÄ±ÅŸÄ±.','warn');return;}
+    if(!canScan()){showToast('Ã‡ok hÄ±zlÄ±! Biraz bekle.','warn');return;}
     var mat=getMat(matId);if(!mat)return;
     lastScanTime=Date.now();
     var cards=document.querySelectorAll('.material-card');for(var i=0;i<cards.length;i++)cards[i].classList.remove('selected');
     var sel=document.querySelector('.material-card[data-mat-id="'+matId+'"]');if(sel)sel.classList.add('selected');
     var bonus=0;if(getTodayScans()+1>=3)bonus=5;var totalPts=mat.pts+bonus;
-    // Günlük max 100 tarama limiti
-    if(getTodayScans()>=100){showToast('Bugünkü limitine ulaştın! Yarın devam et.','info');return;}
+    // GÃ¼nlÃ¼k max 100 tarama limiti
+    if(getTodayScans()>=100){showToast('BugÃ¼nkÃ¼ limitine ulaÅŸtÄ±n! YarÄ±n devam et.','info');return;}
     state.activities.push({category:sanitize(matId),pts:totalPts,binName:currentBin?sanitize(currentBin.binName):'',binId:currentBin?sanitize(currentBin.id):'',date:todayStr(),timestamp:new Date().toISOString()});
     state.totalPoints+=totalPts;state.totalScans++;state.categoryCounts[matId]=(state.categoryCounts[matId]||0)+1;
     if(!state.firstScanDone)state.firstScanDone=true;updateStreak();saveState();
@@ -452,7 +452,7 @@
 
   // ===== CELEBRATION =====
   function showCelebration(pts,bonus,mat){
-    var msg='+'+pts+' puan kazandın!';if(bonus>0)msg+=' (Günlük Seri +'+bonus+')';
+    var msg='+'+pts+' puan kazandÄ±n!';if(bonus>0)msg+=' (GÃ¼nlÃ¼k Seri +'+bonus+')';
     $('cel-pts').textContent=msg;
     // Show material-specific educational info
     $('cel-fact').textContent=mat.info||FUN_FACTS[Math.floor(Math.random()*FUN_FACTS.length)];
@@ -468,7 +468,7 @@
   }
   function renderLeaderboard(tab){
     var list=$('lb-list');
-    list.innerHTML='<p class="empty-msg">Yükleniyor...</p>';
+    list.innerHTML='<p class="empty-msg">YÃ¼kleniyor...</p>';
     fetchLeaderboard(tab,function(fbUsers){
       var isW=(tab==='week');
       var all=[];
@@ -485,7 +485,7 @@
       var top=all.slice(0,10),uIn=false,h='';
       for(var i=0;i<top.length;i++){
         var u=top[i],r=i+1;
-        var rb=r===1?'🥇':r===2?'🥈':r===3?'🥉':String(r);
+        var rb=r===1?'ğŸ¥‡':r===2?'ğŸ¥ˆ':r===3?'ğŸ¥‰':String(r);
         var tc=r<=3?' top'+r:'',uc=u.isUser?' current-user':'';
         if(u.isUser) uIn=true;
         var dn=u.isUser?(u.name+' (Sen)'):u.name;
@@ -495,11 +495,11 @@
       if(!uIn&&state.onboarded){
         var ur=0;for(var i=0;i<all.length;i++)if(all[i].isUser){ur=i+1;break;}
         if(!ur) ur=all.length;
-        h+='<div style="text-align:center;color:var(--text-muted);padding:8px;">· · ·</div>';
+        h+='<div style="text-align:center;color:var(--text-muted);padding:8px;">Â· Â· Â·</div>';
         h+='<div class="lb-item current-user"><div class="lb-rank">'+ur+'</div><div class="lb-avatar">'+avatarHtml(state.avatar)+'</div><div class="lb-name">'+state.name+' (Sen)</div><div class="lb-pts">'+(isW?getWeekPoints():state.totalPoints)+' pts</div></div>';
       }
-      list.innerHTML=h||'<p class="empty-msg">Henüz kimse yok!</p>';
-      // Click handlers — event delegation
+      list.innerHTML=h||'<p class="empty-msg">HenÃ¼z kimse yok!</p>';
+      // Click handlers â€” event delegation
       list.onclick=function(e){
         var item=e.target.closest('[data-lb-idx]');
         if(!item)return;
@@ -548,7 +548,7 @@
           +'<div class="badge-icon">'+b.icon+'</div>'
           +'<div class="badge-name">'+b.name+'</div>'
           +'<div class="badge-desc">'+b.desc+'</div>'
-          +'<div class="badge-progress">'+(e?'✅ Kazanıldı!':prog)+'</div>'
+          +'<div class="badge-progress">'+(e?'âœ… KazanÄ±ldÄ±!':prog)+'</div>'
           +(e?'':'<div class="badge-bar"><div class="badge-bar-fill" style="width:'+pct+'%"></div></div>')
           +'</div>';
       }
@@ -560,7 +560,7 @@
   function initEditName(){
     var modal=$('edit-modal');
     $('btn-edit-name').addEventListener('click',function(){
-      if(window._ecoscanConfig&&window._ecoscanConfig.allowNameChange===false){showToast('İsim değiştirme yönetici tarafından kapatıldı.','warn');return;}
+      if(window._ecoscanConfig&&window._ecoscanConfig.allowNameChange===false){showToast('Ä°sim deÄŸiÅŸtirme yÃ¶netici tarafÄ±ndan kapatÄ±ldÄ±.','warn');return;}
       $('edit-name-input').value=state.name;modal.classList.add('show');
     });
     modal.addEventListener('click',function(e){if(e.target===modal)modal.classList.remove('show');});
@@ -571,7 +571,7 @@
   function initAvatarChange(){
     var modal=$('avatar-modal');
     $('btn-change-avatar').addEventListener('click',function(){
-      if(window._ecoscanConfig&&window._ecoscanConfig.allowAvatarChange===false){showToast('Avatar değiştirme yönetici tarafından kapatıldı.','warn');return;}
+      if(window._ecoscanConfig&&window._ecoscanConfig.allowAvatarChange===false){showToast('Avatar deÄŸiÅŸtirme yÃ¶netici tarafÄ±ndan kapatÄ±ldÄ±.','warn');return;}
       selectedAvatar=state.avatar;
       buildAvatarGrid('avatar-change-grid',function(){});
       modal.classList.add('show');
@@ -599,3 +599,4 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+
