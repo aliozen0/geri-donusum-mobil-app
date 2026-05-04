@@ -1309,3 +1309,146 @@ body {
   pointer-events: none;
   filter: grayscale(0.5);
 }
+
+/* ===== SCREEN MINI LOGO ===== */
+.screen-mini-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  opacity: 0.6;
+  margin-left: auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.1));
+  transition: var(--transition);
+}
+
+.screen-mini-logo:hover {
+  opacity: 0.9;
+  transform: scale(1.08);
+}
+
+.screen-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.screen-header-row .page-title {
+  margin-bottom: 0;
+}
+
+/* Scanner header logo positioning */
+.scanner-header .screen-mini-logo {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.scanner-header {
+  position: relative;
+}
+
+/* ===== ABOUT BUTTON ===== */
+.about-btn {
+  background: linear-gradient(135deg, var(--green-50), var(--green-100)) !important;
+  border-color: var(--green-400) !important;
+  color: var(--green-700) !important;
+}
+
+.about-btn:hover {
+  background: var(--green-100) !important;
+}
+
+/* ===== ABOUT MODAL ===== */
+.about-sheet {
+  text-align: center;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.about-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  margin: 0 auto 12px;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(45,140,78,0.2));
+  animation: aboutLogoIn 0.5s ease;
+}
+
+@keyframes aboutLogoIn {
+  from { opacity: 0; transform: scale(0.7) rotate(-10deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.about-sheet h3 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--green-700);
+  margin-bottom: 4px;
+}
+
+.about-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.about-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green-200), transparent);
+  margin: 16px 0;
+  border-radius: 2px;
+}
+
+.about-section {
+  background: var(--green-50);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.about-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green-700);
+  margin-bottom: 6px;
+}
+
+.about-section p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.about-section strong {
+  color: var(--green-600);
+}
+
+.about-credits {
+  background: linear-gradient(135deg, var(--green-100), var(--green-50));
+  border: 1px solid var(--green-200);
+}
+
+.about-credits p {
+  text-align: center;
+  font-weight: 500;
+}
+
+.about-version {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  padding: 6px 14px;
+  background: var(--white);
+  border: 1px solid var(--green-100);
+  border-radius: var(--radius-full);
+  display: inline-block;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}

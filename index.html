@@ -121,6 +121,7 @@
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M14 4L6 10l8 6"/></svg>
       </button>
       <h2>QR Tara</h2>
+      <img src="ana-logo.png" alt="Logo" class="screen-mini-logo">
     </div>
     <div id="qr-reader"></div>
     <p class="scanner-hint">Geri dönüşüm kutusundaki QR kodu kameraya göster</p>
@@ -141,6 +142,7 @@
   <div class="screen material-screen" id="screen-material">
     <div class="scanner-header" style="justify-content:center;">
       <h2>Malzeme Seç</h2>
+      <img src="ana-logo.png" alt="Logo" class="screen-mini-logo">
     </div>
     <div class="bin-info" id="bin-info">
       <div class="bin-name" id="bin-name"></div>
@@ -151,7 +153,10 @@
 
   <!-- ===== LEADERBOARD ===== -->
   <div class="screen" id="screen-leaderboard">
-    <h2 class="page-title">Sıralama 🏆</h2>
+    <div class="screen-header-row">
+      <h2 class="page-title">Sıralama 🏆</h2>
+      <img src="ana-logo.png" alt="Logo" class="screen-mini-logo">
+    </div>
     <div class="tabs">
       <button class="tab-btn active" data-tab="week">Bu Hafta</button>
       <button class="tab-btn" data-tab="all">Tüm Zamanlar</button>
@@ -161,14 +166,19 @@
 
   <!-- ===== PROFILE ===== -->
   <div class="screen" id="screen-profile">
+    <div class="screen-header-row" style="margin-bottom:0;">
+      <div></div>
+      <img src="ana-logo.png" alt="Logo" class="screen-mini-logo">
+    </div>
     <div class="profile-header">
       <div class="profile-avatar" id="profile-avatar"></div>
       <h2 id="profile-name"></h2>
       <p id="profile-level"></p>
       <p class="level-desc" id="profile-level-desc"></p>
-      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap;">
         <button class="edit-name-btn" id="btn-edit-name">İsmi Düzenle ✏️</button>
         <button class="edit-name-btn" id="btn-change-avatar">Avatar Değiştir 🎭</button>
+        <button class="edit-name-btn about-btn" id="btn-about">Hakkında ℹ️</button>
       </div>
     </div>
     <div class="profile-stats">
@@ -251,6 +261,33 @@
       <p id="um-streak" style="font-size:13px;color:var(--green-600);margin:0 0 16px;"></p>
       <h4 style="font-size:13px;color:var(--text-secondary);margin:0 0 10px;">Kazanılan Rozetler</h4>
       <div class="badges-grid" id="um-badges" style="grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== ABOUT MODAL ===== -->
+  <div class="modal-overlay" id="about-modal">
+    <div class="modal-sheet about-sheet">
+      <img src="ana-logo.png" alt="Okul Logosu" class="about-logo">
+      <h3>Dönüştür Kazan</h3>
+      <p class="about-subtitle">Şehit Erhan Bulut Ortaokulu</p>
+      <div class="about-divider"></div>
+      <div class="about-section">
+        <h4>🏫 Proje Hakkında</h4>
+        <p>Bu uygulama, Şehit Erhan Bulut Ortaokulu öğrencileri tarafından <strong>Harezmi Eğitim Modeli</strong> kapsamında geliştirilmiştir. Amacımız geri dönüşümü eğlenceli hale getirerek çevre bilincini artırmaktır.</p>
+      </div>
+      <div class="about-section">
+        <h4>♻️ Nasıl Çalışır?</h4>
+        <p>Geri dönüşüm kutularındaki QR kodları tara, malzeme seç ve puan kazan! Puanlarınla sıralamada yüksel, rozetler kazan ve çevreye katkıda bulun.</p>
+      </div>
+      <div class="about-section">
+        <h4>🌍 Misyonumuz</h4>
+        <p>Her geri dönüşüm dünyayı daha yaşanabilir kılar. Küçük adımlarla büyük değişimler yaratabiliriz!</p>
+      </div>
+      <div class="about-section about-credits">
+        <h4>👨‍💻 Geliştirici Ekip</h4>
+        <p>Şehit Erhan Bulut Ortaokulu<br>Harezmi Eğitim Modeli Projesi<br>2025-2026 Eğitim Öğretim Yılı</p>
+      </div>
+      <div class="about-version">v1.0 · Dönüştür Kazan</div>
     </div>
   </div>
 </div>

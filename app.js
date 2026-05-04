@@ -657,10 +657,19 @@
     });
   }
 
+  // ===== ABOUT MODAL =====
+  function initAbout(){
+    var modal=$('about-modal');
+    $('btn-about').addEventListener('click',function(){
+      modal.classList.add('show');
+    });
+    modal.addEventListener('click',function(e){if(e.target===modal)modal.classList.remove('show');});
+  }
+
   // ===== INIT =====
   function init(){
     initFirebase();
-    initOnboarding();initEditName();initAvatarChange();
+    initOnboarding();initEditName();initAvatarChange();initAbout();
     var navs=document.querySelectorAll('.nav-item');
     for(var i=0;i<navs.length;i++)(function(b){b.addEventListener('click',function(){showScreen(b.getAttribute('data-screen'));});})(navs[i]);
     $('btn-scan-home').addEventListener('click',function(){showScreen('scanner');});
