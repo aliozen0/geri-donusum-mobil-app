@@ -15,9 +15,9 @@ service cloud.firestore {
 
       // Normal kullanıcı: sadece kendi verisini, doğrulama ile
       allow write: if (request.auth != null && request.auth.uid == userId
-                       // Yasaklı kullanıcı yazamaz
-                       && !(exists(/databases/$(database)/documents/users/$(userId))
-                            && resource.data.banned == true)
+                       // Yasaklı kullanıcı yazamaz (get ile default false)
+                       && !(resource != null
+                            && resource.data.get('banned', false) == true)
                        // Tip doğrulama
                        && request.resource.data.name is string
                        && request.resource.data.name.size() >= 1
